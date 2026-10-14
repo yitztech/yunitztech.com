@@ -15,14 +15,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yprevot/yunitztech.com.git"
+    "url": "git+https://github.com/yitztech/yunitztech.com.git"
   },
   "keywords": [],
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/yprevot/yunitztech.com/issues"
+    "url": "https://github.com/yitztech/yunitztech.com/issues"
   },
-  "homepage": "https://github.com/yprevot/yunitztech.com#readme",
+  "homepage": "https://github.com/yitztech/yunitztech.com#readme",
   "private": true,
   "workspaces": [
     "apps/*"
