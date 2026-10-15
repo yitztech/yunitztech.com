@@ -1,40 +1,102 @@
 ---
 import Layout from "../layouts/Layout.astro";
+
+const supportedLocales = ["es", "en", "fr", "de", "pt"] as const;
+type Locale = (typeof supportedLocales)[number];
+
 const { lang = "es", posts = [], failed = false } = Astro.props;
-const en = lang === "en";
+const currentLang = (supportedLocales.includes(lang as any) ? lang : "es") as Locale;
+const prefix = currentLang === "es" ? "" : `/${currentLang}`;
+
+const alternates = {
+  es: "/blog",
+  en: "/en/blog",
+  fr: "/fr/blog",
+  de: "/de/blog",
+  pt: "/pt/blog",
+};
+
+const titles: Record<Locale, string> = {
+  es: "Ideas de MVP para mipymes | Blog YunitzTech",
+  en: "MVP ideas for small businesses | YunitzTech Blog",
+  fr: "Idées de MVP pour petites entreprises | Blog YunitzTech",
+  de: "MVP-Ideen für kleine Unternehmen | YunitzTech Blog",
+  pt: "Ideias de MVP para pequenas empresas | Blog YunitzTech",
+};
+
+const descriptions: Record<Locale, string> = {
+  es: "Artículos prácticos sobre validación de ideas, lanzamiento de MVP y herramientas digitales para pequeños negocios.",
+  en: "Practical articles on validating ideas, launching an MVP and building digital tools for small businesses.",
+  fr: "Articles pratiques sur la validation d'idées, le lancement d'un MVP et les outils numériques pour petites entreprises.",
+  de: "Praktische Artikel über die Validierung von Ideen, den Launch eines MVP und digitale Werkzeuge für kleine Unternehmen.",
+  pt: "Artigos práticos sobre validação de ideias, lançamento de MVP e ferramentas digitais para pequenos negócios.",
+};
+
+const eyebrows: Record<Locale, string> = {
+  es: "El blog de YunitzTech",
+  en: "The YunitzTech journal",
+  fr: "Le carnet YunitzTech",
+  de: "Das YunitzTech Journal",
+  pt: "O blog da YunitzTech",
+};
+
+const headings: Record<Locale, string> = {
+  es: "Ideas para tu siguiente paso.",
+  en: "Ideas for your next step.",
+  fr: "Des idées pour votre prochaine étape.",
+  de: "Ideen für Ihren nächsten Schritt.",
+  pt: "Ideias para o seu próximo passo.",
+};
+
+const leads: Record<Locale, string> = {
+  es: "Menos tecnicismos. Más claridad para empezar a construir tu negocio.",
+  en: "Less jargon. More clarity to start building your business.",
+  fr: "Moins de jargon. Plus de clarté pour commencer à bâtir votre entreprise.",
+  de: "Weniger Fachjargon. Mehr Klarheit beim Aufbau Ihres Unternehmens.",
+  pt: "Menos jargões. Mais clareza para começar a construir seu negócio.",
+};
+
+const readArticles: Record<Locale, string> = {
+  es: "Leer artículo",
+  en: "Read article",
+  fr: "Lire l'article",
+  de: "Artikel lesen",
+  pt: "Ler artigo",
+};
+
+const failedTexts: Record<Locale, string> = {
+  es: "Los artículos no están disponibles temporalmente. Intenta nuevamente en unos minutos.",
+  en: "Articles are temporarily unavailable. Please try again shortly.",
+  fr: "Les articles sont temporairement indisponibles. Veuillez réessayer dans quelques instants.",
+  de: "Artikel sind vorübergehend nicht verfügbar. Bitte versuchen Sie es in Kürze erneut.",
+  pt: "Os artigos estão temporariamente indisponíveis. Tente novamente em alguns minutos.",
+};
+
+const emptyTexts: Record<Locale, string> = {
+  es: "Pronto publicaremos nuevos artículos.",
+  en: "New articles are on their way.",
+  fr: "De nouveaux articles seront bientôt publiés.",
+  de: "Neue Artikel sind in Vorbereitung.",
+  pt: "Em breve publicaremos novos artigos.",
+};
 ---
 
 <Layout
-  lang={lang}
-  title={
-    en
-      ? "MVP ideas for small businesses | YunitzTech Blog"
-      : "Ideas de MVP para mipymes | Blog YunitzTech"
-  }
-  description={
-    en
-      ? "Practical articles on validating ideas, launching an MVP and building digital tools for small businesses."
-      : "Artículos prácticos sobre validación de ideas, lanzamiento de MVP y herramientas digitales para pequeños negocios."
-  }
-  alternate={en ? "/blog" : "/en/blog"}
+  lang={currentLang}
+  title={titles[currentLang]}
+  description={descriptions[currentLang]}
+  alternate={currentLang === "en" ? "/blog" : "/en/blog"}
+  alternates={alternates}
 >
   <section class="container section">
-    <p class="eyebrow">
-      {en ? "The YunitzTech journal" : "El blog de YunitzTech"}
-    </p>
-    <h1>
-      {en ? "Ideas for your next step." : "Ideas para tu siguiente paso."}
-    </h1>
-    <p class="lead">
-      {en
-        ? "Less jargon. More clarity to start building your business."
-        : "Menos tecnicismos. Más claridad para empezar a construir tu negocio."}
-    </p>
+    <p class="eyebrow">{eyebrows[currentLang]}</p>
+    <h1>{headings[currentLang]}</h1>
+    <p class="lead">{leads[currentLang]}</p>
     <div class="post-grid">
       {posts.map((p: any, i: number) => (
         <a
           class={"post-card tone-" + (i % 3)}
-          href={(en ? "/en" : "") + "/blog/" + p.slug}
+          href={prefix + "/blog/" + p.slug}
         >
           <div class="post-image">
             <img
@@ -49,25 +111,17 @@ const en = lang === "en";
             <h2 style="font-size:1.4rem">{p.title}</h2>
             <p>{p.excerpt}</p>
             <span class="text-link">
-              {en ? "Read article" : "Leer artículo"} ↗
+              {readArticles[currentLang]} ↗
             </span>
           </div>
         </a>
       ))}
     </div>
     {failed && (
-      <p role="alert">
-        {en
-          ? "Articles are temporarily unavailable. Please try again shortly."
-          : "Los artículos no están disponibles temporalmente. Intenta nuevamente en unos minutos."}
-      </p>
+      <p role="alert">{failedTexts[currentLang]}</p>
     )}
     {!failed && !posts.length && (
-      <p>
-        {en
-          ? "New articles are on their way."
-          : "Pronto publicaremos nuevos artículos."}
-      </p>
+      <p>{emptyTexts[currentLang]}</p>
     )}
   </section>
 </Layout>

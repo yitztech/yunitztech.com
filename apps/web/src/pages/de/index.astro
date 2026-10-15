@@ -1,0 +1,13 @@
+---
+import Home from "../../components/Home.astro";
+import { api } from "../../lib/api";
+let content: any,
+  posts: any[] = [];
+try {
+  [content, posts] = await Promise.all([api("site/de"), api("posts/de")]);
+} catch {
+  Astro.response.status = 503;
+}
+---
+
+<Home lang="de" content={content} posts={posts} />

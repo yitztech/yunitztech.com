@@ -1,54 +1,473 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { siteUrl } from "../lib/api";
+
+const supportedLocales = ["es", "en", "fr", "de", "pt"] as const;
+type Locale = (typeof supportedLocales)[number];
+
 const { lang = "es", content, posts = [] } = Astro.props;
-const en = lang === "en";
-const prefix = en ? "/en" : "";
-const steps = en
-  ? [
-      [
-        "Understand your idea",
-        "We talk about your customers, your business and the problem worth solving.",
-      ],
-      [
-        "Build the essentials",
-        "We define a focused first version and turn it into a product you can use.",
-      ],
-      [
-        "Launch, learn, improve",
-        "We release it, listen to real customers and decide what comes next.",
-      ],
-    ]
-  : [
-      [
-        "Entendemos tu idea",
-        "Conversamos sobre tus clientes, tu negocio y el problema que vale la pena resolver.",
-      ],
-      [
-        "Creamos lo esencial",
-        "Definimos una primera versión enfocada y la convertimos en un producto que puedes usar.",
-      ],
-      [
-        "Lanzamos, aprendemos, mejoramos",
-        "Lo ponemos en marcha, escuchamos a clientes reales y decidimos qué sigue.",
-      ],
-    ];
+const currentLang = (supportedLocales.includes(lang as any) ? lang : "es") as Locale;
+const prefix = currentLang === "es" ? "" : `/${currentLang}`;
+
+const alternates = {
+  es: "/",
+  en: "/en/",
+  fr: "/fr/",
+  de: "/de/",
+  pt: "/pt/",
+};
+
+const metaTitles: Record<Locale, string> = {
+  es: "Desarrollo de MVP para mipymes | YunitzTech",
+  en: "MVP development for small businesses | YunitzTech",
+  fr: "Développement de MVP pour petites entreprises | YunitzTech",
+  de: "MVP-Entwicklung für kleine Unternehmen | YunitzTech",
+  pt: "Desenvolvimento de MVP para pequenas empresas | YunitzTech",
+};
+
+const metaDescriptions: Record<Locale, string> = {
+  es: "Convierte tu idea de negocio en un producto digital útil. Landing pages, tiendas en línea, reservaciones y aplicaciones para mipymes.",
+  en: "Turn your business idea into a useful digital product. Landing pages, online stores, booking systems and apps for small businesses.",
+  fr: "Transformez votre idée d'entreprise en un produit numérique utile. Pages de vente, boutiques en ligne, systèmes de réservation et applications pour petites entreprises.",
+  de: "Verwandeln Sie Ihre Geschäftsidee in ein nützliches digitales Produkt. Landingpages, Onlineshops, Buchungssysteme und Apps für kleine Unternehmen.",
+  pt: "Transforme sua ideia de negócio em um produto digital útil. Landing pages, lojas virtuais, sistemas de agendamento e aplicativos para pequenas empresas.",
+};
+
+const orgDescriptions: Record<Locale, string> = {
+  es: "Productos digitales y MVP para mipymes",
+  en: "Digital products and MVPs for small businesses",
+  fr: "Produits numériques et MVP pour petites entreprises",
+  de: "Digitale Produkte und MVPs für kleine Unternehmen",
+  pt: "Produtos digitais e MVP para pequenas empresas",
+};
+
+const emptyStates: Record<Locale, { title: string; desc: string }> = {
+  es: { title: "Volvemos en un momento", desc: "Intenta nuevamente en unos minutos." },
+  en: { title: "We’ll be back shortly", desc: "Please try again shortly." },
+  fr: { title: "Nous revenons dans un instant", desc: "Veuillez réessayer dans quelques minutes." },
+  de: { title: "Wir sind gleich zurück", desc: "Bitte versuchen Sie es in wenigen Minuten erneut." },
+  pt: { title: "Voltamos em um momento", desc: "Tente novamente em alguns minutos." },
+};
+
+const heroData: Record<Locale, {
+  eyebrow: string;
+  tellIdea: string;
+  exploreServices: string;
+  note: string;
+  caption: string;
+  imgAlt: string;
+  noteTitle: string;
+  noteSubtitle: string;
+}> = {
+  es: {
+    eyebrow: "Un aliado digital para tu negocio",
+    tellIdea: "Cuéntanos tu idea",
+    exploreServices: "Explora los servicios",
+    note: "Un alcance claro. Un producto útil. Espacio para crecer.",
+    caption: "Del “¿y si…?” al “ya está en marcha”",
+    imgAlt: "Personas colaborando alrededor de un portátil para revisar un proyecto",
+    noteTitle: "Tu idea, tomando forma",
+    noteSubtitle: "Construida alrededor de lo importante",
+  },
+  en: {
+    eyebrow: "A digital partner for your business",
+    tellIdea: "Tell us about your idea",
+    exploreServices: "Explore our services",
+    note: "A clear scope. A useful product. Room to grow.",
+    caption: "From “what if” to “it’s live”",
+    imgAlt: "People collaborating around a laptop to review a project",
+    noteTitle: "Your idea, taking shape",
+    noteSubtitle: "Built around what matters",
+  },
+  fr: {
+    eyebrow: "Un partenaire numérique pour votre entreprise",
+    tellIdea: "Parlez-nous de votre idée",
+    exploreServices: "Découvrez nos services",
+    note: "Un périmètre clair. Un produit utile. De l'espace pour grandir.",
+    caption: "Du « et si... ? » au « c'est lancé »",
+    imgAlt: "Des personnes collaborant autour d'un ordinateur portable pour examiner un projet",
+    noteTitle: "Votre idée prend forme",
+    noteSubtitle: "Construite autour de l'essentiel",
+  },
+  de: {
+    eyebrow: "Ein digitaler Partner für Ihr Unternehmen",
+    tellIdea: "Erzählen Sie uns von Ihrer Idee",
+    exploreServices: "Dienste erkunden",
+    note: "Klarer Umfang. Nützliches Produkt. Raum zum Wachsen.",
+    caption: "Vom „Was wäre wenn…“ zum „Es läuft“",
+    imgAlt: "Personen, die an einem Laptop zusammenarbeiten, um ein Projekt zu überprüfen",
+    noteTitle: "Ihre Idee nimmt Gestalt an",
+    noteSubtitle: "Auf das Wesentliche ausgerichtet",
+  },
+  pt: {
+    eyebrow: "Um parceiro digital para o seu negócio",
+    tellIdea: "Conte-nos sua ideia",
+    exploreServices: "Explore os serviços",
+    note: "Um escopo claro. Um produto útil. Espaço para crescer.",
+    caption: "Do “e se…?” ao “já está no ar”",
+    imgAlt: "Pessoas colaborando em torno de um laptop para revisar um projeto",
+    noteTitle: "Sua ideia, tomando forma",
+    noteSubtitle: "Construída em torno do que importa",
+  },
+};
+
+const focusStripData: Record<Locale, { label: string; items: string[] }> = {
+  es: {
+    label: "Hecho para negocios como el tuyo",
+    items: ["Comercios", "Profesionales", "Servicios", "Emprendimientos"],
+  },
+  en: {
+    label: "Made for businesses like yours",
+    items: ["Local shops", "Independent professionals", "Service businesses", "New ventures"],
+  },
+  fr: {
+    label: "Conçu pour des entreprises comme la vôtre",
+    items: ["Commerces", "Professionnels", "Services", "Nouveaux projets"],
+  },
+  de: {
+    label: "Gemacht für Unternehmen wie Ihres",
+    items: ["Geschäfte", "Freiberufler", "Dienstleister", "Neugründungen"],
+  },
+  pt: {
+    label: "Feito para negócios como o seu",
+    items: ["Comércios", "Profissionais", "Serviços", "Empreendimentos"],
+  },
+};
+
+const servicesHeading: Record<Locale, { eyebrow: string; title: string; desc: string; talkAbout: string; explore: string }> = {
+  es: {
+    eyebrow: "Lo que podemos crear juntos",
+    title: "Grandes planes.\nEl primer paso correcto.",
+    desc: "No necesitas todas las funciones desde el primer día. Necesitas las herramientas correctas para empezar, aprender y crecer.",
+    talkAbout: "Conversar sobre ",
+    explore: "Exploremos tu idea",
+  },
+  en: {
+    eyebrow: "What we can build together",
+    title: "Big plans.\nThe right first step.",
+    desc: "You don’t need every feature on day one. You need the right tools to start, learn and grow.",
+    talkAbout: "Talk about ",
+    explore: "Let’s explore it",
+  },
+  fr: {
+    eyebrow: "Ce que nous pouvons créer ensemble",
+    title: "De grands projets.\nLe bon premier pas.",
+    desc: "Vous n'avez pas besoin de toutes les fonctionnalités dès le premier jour. Vous avez besoin des bons outils pour démarrer, apprendre et grandir.",
+    talkAbout: "Échanger sur ",
+    explore: "Explorons votre idée",
+  },
+  de: {
+    eyebrow: "Was wir gemeinsam aufbauen können",
+    title: "Große Pläne.\nDer richtige erste Schritt.",
+    desc: "Sie brauchen nicht am ersten Tag jede Funktion. Sie brauchen die richtigen Werkzeuge, um zu starten, zu lernen und zu wachsen.",
+    talkAbout: "Sprechen über ",
+    explore: "Gemeinsam besprechen",
+  },
+  pt: {
+    eyebrow: "O que podemos criar juntos",
+    title: "Grandes planos.\nO primeiro passo certo.",
+    desc: "Você não precisa de todos os recursos no primeiro dia. Você precisa das ferramentas certas para começar, aprender e crescer.",
+    talkAbout: "Conversar sobre ",
+    explore: "Vamos explorar sua ideia",
+  },
+};
+
+const mvpData: Record<Locale, {
+  imgAlt: string;
+  learnLabel: string;
+  eyebrow: string;
+  title: string;
+  lead: string;
+  checks: string[];
+  articleSlug: string;
+  learnMore: string;
+}> = {
+  es: {
+    imgAlt: "Dos personas conversan sobre una idea mientras revisan un portátil",
+    learnLabel: "Crear → aprender → crecer",
+    eyebrow: "Empieza pequeño. Piensa a futuro.",
+    title: "Menos suposiciones.\nMás aprendizaje real.",
+    lead: "Un MVP es la versión más sencilla de tu producto que resuelve un problema real. Te ayudamos a enfocar tu inversión en lo que importa primero.",
+    checks: ["Valida tu idea con clientes reales", "Mantén enfocada tu primera versión", "Crece a partir de lo que aprendes"],
+    articleSlug: "empezar-con-un-mvp",
+    learnMore: "Conoce más sobre los MVP",
+  },
+  en: {
+    imgAlt: "Two people discuss an idea while reviewing a laptop",
+    learnLabel: "Build → learn → grow",
+    eyebrow: "Start small. Think ahead.",
+    title: "Less guesswork.\nMore real learning.",
+    lead: "An MVP is the simplest version of your product that solves a real problem. We help you focus your investment where it matters first.",
+    checks: ["Validate your idea with real customers", "Keep the first release focused", "Grow from what you learn"],
+    articleSlug: "why-your-business-needs-an-mvp",
+    learnMore: "Learn more about MVPs",
+  },
+  fr: {
+    imgAlt: "Deux personnes discutent d'une idée en examinant un ordinateur portable",
+    learnLabel: "Créer → apprendre → grandir",
+    eyebrow: "Commencez petit. Pensez à l'avenir.",
+    title: "Moins de suppositions.\nPlus d'apprentissage réel.",
+    lead: "Un MVP est la version la plus simple de votre produit qui résout un vrai problème. Nous vous aidons à concentrer votre investissement sur ce qui compte en premier.",
+    checks: ["Validez votre idée auprès de vrais clients", "Gardez votre première version ciblée", "Évoluez grâce à vos apprentissages"],
+    articleSlug: "pourquoi-votre-entreprise-a-besoin-d-un-mvp",
+    learnMore: "En savoir plus sur les MVP",
+  },
+  de: {
+    imgAlt: "Zwei Personen besprechen eine Idee an einem Laptop",
+    learnLabel: "Bauen → lernen → wachsen",
+    eyebrow: "Klein anfangen. Vorausschauend denken.",
+    title: "Weniger Vermutungen.\nMehr echtes Lernen.",
+    lead: "Ein MVP ist die einfachste Version Ihres Produkts, die ein echtes Problem löst. Wir helfen Ihnen, Ihre Investition zuerst auf das Wesentliche zu konzentrieren.",
+    checks: ["Validieren Sie Ihre Idee mit echten Kunden", "Halten Sie die erste Version fokussiert", "Wachsen Sie mit Ihren Erkenntnissen"],
+    articleSlug: "warum-ihr-unternehmen-ein-mvp-braucht",
+    learnMore: "Mehr über MVPs erfahren",
+  },
+  pt: {
+    imgAlt: "Duas pessoas conversam sobre uma ideia enquanto revisam um laptop",
+    learnLabel: "Criar → aprender → crescer",
+    eyebrow: "Comece pequeno. Pense no futuro.",
+    title: "Menos suposições.\nMais aprendizado real.",
+    lead: "Um MVP é a versão mais simples do seu produto que resolve um problema real. Ajudamos você a focar seu investimento no que importa primeiro.",
+    checks: ["Valide sua ideia com clientes reais", "Mantenha a primeira versão focada", "Cresça a partir do que você aprende"],
+    articleSlug: "por-que-sua-empresa-precisa-de-um-mvp",
+    learnMore: "Saiba mais sobre os MVPs",
+  },
+};
+
+const processData: Record<Locale, {
+  eyebrow: string;
+  title: string;
+  desc: string;
+  steps: [string, string][];
+}> = {
+  es: {
+    eyebrow: "Un camino compartido",
+    title: "De la primera conversación\nal primer lanzamiento.",
+    desc: "Comunicación clara y decisiones que tomamos juntos. Sabes qué estamos construyendo y por qué.",
+    steps: [
+      ["Entendemos tu idea", "Conversamos sobre tus clientes, tu negocio y el problema que vale la pena resolver."],
+      ["Creamos lo esencial", "Definimos una primera versión enfocada y la convertimos en un producto que puedes usar."],
+      ["Lanzamos, aprendemos, mejoramos", "Lo ponemos en marcha, escuchamos a clientes reales y decidimos qué sigue."],
+    ],
+  },
+  en: {
+    eyebrow: "A shared journey",
+    title: "From the first conversation\nto your first launch.",
+    desc: "Clear communication and decisions we make together. You know what we’re building and why.",
+    steps: [
+      ["Understand your idea", "We talk about your customers, your business and the problem worth solving."],
+      ["Build the essentials", "We define a focused first version and turn it into a product you can use."],
+      ["Launch, learn, improve", "We release it, listen to real customers and decide what comes next."],
+    ],
+  },
+  fr: {
+    eyebrow: "Un parcours partagé",
+    title: "De la première discussion\nau premier lancement.",
+    desc: "Une communication claire et des décisions prises ensemble. Vous savez ce que nous construisons et pourquoi.",
+    steps: [
+      ["Comprendre votre idée", "Nous échangeons sur vos clients, votre activité et le problème qui mérite d'être résolu."],
+      ["Créer l'essentiel", "Nous définissons une première version ciblée et la transformons en un produit utilisable."],
+      ["Lancer, apprendre, progresser", "Nous le mettons en ligne, écoutons les retours de vrais clients et décidons de la suite."],
+    ],
+  },
+  de: {
+    eyebrow: "Ein gemeinsamer Weg",
+    title: "Vom ersten Gespräch\nbis zum ersten Launch.",
+    desc: "Klare Kommunikation und gemeinsame Entscheidungen. Sie wissen, was wir bauen und warum.",
+    steps: [
+      ["Ihre Idee verstehen", "Wir sprechen über Ihre Kunden, Ihr Geschäft und das Problem, das gelöst werden soll."],
+      ["Das Wesentliche bauen", "Wir definieren eine fokussierte Erstversion und machen daraus ein nutzbares Produkt."],
+      ["Starten, lernen, verbessern", "Wir gehen online, hören echten Kunden zu und entscheiden über die nächsten Schritte."],
+    ],
+  },
+  pt: {
+    eyebrow: "Um caminho compartilhado",
+    title: "Da primeira conversa\nao primeiro lançamento.",
+    desc: "Comunicação clara e decisões tomadas em conjunto. Você sabe o que estamos construindo e por quê.",
+    steps: [
+      ["Entender a sua ideia", "Conversamos sobre seus clientes, seu negócio e o problema que vale a pena resolver."],
+      ["Criar o essencial", "Definimos uma primeira versão focada e a transformamos em um produto que você pode usar."],
+      ["Lançar, aprender, melhorar", "Colocamos no ar, ouvimos clientes reais e decidimos o próximo passo."],
+    ],
+  },
+};
+
+const blogSectionData: Record<Locale, {
+  eyebrow: string;
+  title: string;
+  allArticles: string;
+  tag: string;
+  readArticle: string;
+}> = {
+  es: {
+    eyebrow: "Ideas para dar el siguiente paso",
+    title: "Un poco de claridad\npara tu gran idea.",
+    allArticles: "Todos los artículos",
+    tag: "Emprender con tecnología",
+    readArticle: "Leer artículo",
+  },
+  en: {
+    eyebrow: "Ideas to move forward",
+    title: "A little clarity\nfor your big idea.",
+    allArticles: "All articles",
+    tag: "Starting a business",
+    readArticle: "Read article",
+  },
+  fr: {
+    eyebrow: "Des idées pour avancer",
+    title: "Un peu de clarté\npour votre grand projet.",
+    allArticles: "Tous les articles",
+    tag: "Entreprendre avec la technologie",
+    readArticle: "Lire l'article",
+  },
+  de: {
+    eyebrow: "Ideen für den nächsten Schritt",
+    title: "Ein wenig Klarheit\nfür Ihre große Idee.",
+    allArticles: "Alle Artikel",
+    tag: "Mit Technologie gründen",
+    readArticle: "Artikel lesen",
+  },
+  pt: {
+    eyebrow: "Ideias para dar o próximo passo",
+    title: "Um pouco de clareza\npara a sua grande ideia.",
+    allArticles: "Todos os artigos",
+    tag: "Empreender com tecnologia",
+    readArticle: "Ler artigo",
+  },
+};
+
+const contactData: Record<Locale, {
+  eyebrow: string;
+  title: string;
+  lead: string;
+  note: string;
+  nameLabel: string;
+  emailLabel: string;
+  companyLabel: string;
+  serviceLabel: string;
+  chooseService: string;
+  helpMvp: string;
+  messageLabel: string;
+  placeholder: string;
+  consentPrefix: string;
+  privacyLink: string;
+  privacyLabel: string;
+  consentSuffix: string;
+  submitButton: string;
+}> = {
+  es: {
+    eyebrow: "Tu siguiente paso empieza aquí",
+    title: "Tú pones la idea.\nConstruyamos lo que sigue.",
+    lead: "Cuéntanos lo que tienes en mente, aunque todavía esté en una servilleta. Juntos exploraremos una primera versión posible.",
+    note: "No necesitas un documento técnico. Empieza por tu negocio y el problema que quieres resolver.",
+    nameLabel: "Tu nombre",
+    emailLabel: "Tu correo",
+    companyLabel: "Nombre del negocio (opcional)",
+    serviceLabel: "¿Qué tienes en mente?",
+    chooseService: "Elige un servicio",
+    helpMvp: "Ayuda para definir mi MVP",
+    messageLabel: "Cuéntanos tu idea",
+    placeholder: "¿Qué te gustaría resolver para tus clientes?",
+    consentPrefix: "He leído la",
+    privacyLink: "/politica-de-privacidad",
+    privacyLabel: "política de privacidad",
+    consentSuffix: "y acepto que me contacten sobre mi solicitud.",
+    submitButton: "Enviar mi idea",
+  },
+  en: {
+    eyebrow: "Your next step starts here",
+    title: "You bring the idea.\nLet’s build what’s next.",
+    lead: "Tell us what you have in mind, even if it’s still on a napkin. We’ll explore a practical first version together.",
+    note: "No need for a technical brief. Start with your business and the problem you want to solve.",
+    nameLabel: "Your name",
+    emailLabel: "Your email",
+    companyLabel: "Business name (optional)",
+    serviceLabel: "What do you have in mind?",
+    chooseService: "Choose a service",
+    helpMvp: "Help defining my MVP",
+    messageLabel: "Tell us about your idea",
+    placeholder: "What would you like to solve for your customers?",
+    consentPrefix: "I have read the",
+    privacyLink: "/en/privacy-policy",
+    privacyLabel: "privacy policy",
+    consentSuffix: "and agree to be contacted about my request.",
+    submitButton: "Send my idea",
+  },
+  fr: {
+    eyebrow: "Votre prochaine étape commence ici",
+    title: "Vous apportez l'idée.\nConstruisons la suite.",
+    lead: "Dites-nous ce que vous avez en tête, même si ce n'est encore qu'un croquis. Ensemble, nous explorerons une première version réalisable.",
+    note: "Pas besoin de cahier des charges technique. Partez de votre activité et du problème que vous souhaitez résoudre.",
+    nameLabel: "Votre nom",
+    emailLabel: "Votre e-mail",
+    companyLabel: "Nom de l'entreprise (facultatif)",
+    serviceLabel: "Qu'avez-vous en tête ?",
+    chooseService: "Choisissez un service",
+    helpMvp: "Aide pour définir mon MVP",
+    messageLabel: "Parlez-nous de votre idée",
+    placeholder: "Que souhaitez-vous résoudre pour vos clients ?",
+    consentPrefix: "J'ai lu la",
+    privacyLink: "/fr/politique-de-confidentialite",
+    privacyLabel: "politique de confidentialité",
+    consentSuffix: "et j'accepte d'être contacté(e) au sujet de ma demande.",
+    submitButton: "Envoyer mon idée",
+  },
+  de: {
+    eyebrow: "Ihr nächster Schritt beginnt hier",
+    title: "Sie bringen die Idee mit.\nBauen wir das Nächste.",
+    lead: "Erzählen Sie uns, was Sie vorhaben, auch wenn es nur eine Skizze ist. Wir erarbeiten gemeinsam eine machbare Erstversion.",
+    note: "Kein technisches Pflichtenheft nötig. Beginnen Sie mit Ihrem Unternehmen und dem Problem, das Sie lösen möchten.",
+    nameLabel: "Ihr Name",
+    emailLabel: "Ihre E-Mail",
+    companyLabel: "Unternehmensname (optional)",
+    serviceLabel: "Was haben Sie vor?",
+    chooseService: "Dienst auswählen",
+    helpMvp: "Hilfe bei der Definition meines MVP",
+    messageLabel: "Erzählen Sie uns von Ihrer Idee",
+    placeholder: "Was möchten Sie für Ihre Kunden lösen?",
+    consentPrefix: "Ich habe die",
+    privacyLink: "/de/datenschutzerklaerung",
+    privacyLabel: "Datenschutzerklärung",
+    consentSuffix: "gelesen und stimme einer Kontaktaufnahme bezüglich meiner Anfrage zu.",
+    submitButton: "Meine Idee senden",
+  },
+  pt: {
+    eyebrow: "Seu próximo passo começa aqui",
+    title: "Você traz a ideia.\nVamos construir o que vem a seguir.",
+    lead: "Conte-nos o que você tem em mente, mesmo que ainda esteja em um rascunho. Juntos vamos explorar uma primeira versão viável.",
+    note: "Não precisa de um documento técnico. Comece pelo seu negócio e pelo problema que deseja resolver.",
+    nameLabel: "Seu nome",
+    emailLabel: "Seu e-mail",
+    companyLabel: "Nome do negócio (opcional)",
+    serviceLabel: "O que você tem em mente?",
+    chooseService: "Escolha um serviço",
+    helpMvp: "Ajuda para definir meu MVP",
+    messageLabel: "Conte-nos a sua ideia",
+    placeholder: "¿O que você gostaria de resolver para os seus clientes?",
+    consentPrefix: "Li a",
+    privacyLink: "/pt/politica-de-privacidade",
+    privacyLabel: "política de privacidade",
+    consentSuffix: "e concordo em ser contatado sobre minha solicitação.",
+    submitButton: "Enviar minha ideia",
+  },
+};
+
+const hero = heroData[currentLang];
+const focusStrip = focusStripData[currentLang];
+const services = servicesHeading[currentLang];
+const mvp = mvpData[currentLang];
+const proc = processData[currentLang];
+const blogSec = blogSectionData[currentLang];
+const contact = contactData[currentLang];
 ---
 
 <Layout
-  lang={lang}
-  title={
-    en
-      ? "MVP development for small businesses | YunitzTech"
-      : "Desarrollo de MVP para mipymes | YunitzTech"
-  }
-  description={
-    en
-      ? "Turn your business idea into a useful digital product. Landing pages, online stores, booking systems and apps for small businesses."
-      : "Convierte tu idea de negocio en un producto digital útil. Landing pages, tiendas en línea, reservaciones y aplicaciones para mipymes."
-  }
+  lang={currentLang}
+  title={metaTitles[currentLang]}
+  description={metaDescriptions[currentLang]}
   image={content?.image}
-  alternate={en ? "/" : "/en/"}
+  alternate={currentLang === "en" ? "/" : "/en/"}
+  alternates={alternates}
 >
   <script
     slot="head"
@@ -58,19 +477,13 @@ const steps = en
       "@type": "Organization",
       name: "YunitzTech",
       url: siteUrl,
-      description: en
-        ? "Digital products and MVPs for small businesses"
-        : "Productos digitales y MVP para mipymes",
+      description: orgDescriptions[currentLang],
     }).replace(/</g, "\\u003c")}
   />
   {!content ? (
     <section class="container section">
-      <h1>{en ? "We’ll be back shortly" : "Volvemos en un momento"}</h1>
-      <p>
-        {en
-          ? "Please try again shortly."
-          : "Intenta nuevamente en unos minutos."}
-      </p>
+      <h1>{emptyStates[currentLang].title}</h1>
+      <p>{emptyStates[currentLang].desc}</p>
     </section>
   ) : (
     <>
@@ -78,46 +491,34 @@ const steps = en
         <div class="hero-copy">
           <p class="eyebrow">
             <span class="status-dot"></span>
-            {en
-              ? "A digital partner for your business"
-              : "Un aliado digital para tu negocio"}
+            {hero.eyebrow}
           </p>
           <h1>{content.headline}</h1>
           <p class="lead">{content.description}</p>
           <div class="hero-actions">
             <a class="button" href="#contacto">
-              {en ? "Tell us about your idea" : "Cuéntanos tu idea"}{" "}
+              {hero.tellIdea}{" "}
               <span aria-hidden="true">↗</span>
             </a>
             <a class="text-link" href="#servicios">
-              {en ? "Explore our services" : "Explora los servicios"}{" "}
+              {hero.exploreServices}{" "}
               <span aria-hidden="true">↓</span>
             </a>
           </div>
-          <p class="hero-note">
-            {en
-              ? "A clear scope. A useful product. Room to grow."
-              : "Un alcance claro. Un producto útil. Espacio para crecer."}
-          </p>
+          <p class="hero-note">{hero.note}</p>
         </div>
         <div class="hero-art">
           <div class="art-caption">
             <span class="tiny-icon" aria-hidden="true">
               ✦
             </span>
-            {en
-              ? "From “what if” to “it’s live”"
-              : "Del “¿y si…?” al “ya está en marcha”"}
+            {hero.caption}
           </div>
           <img
             src={content.image}
             width="1200"
             height="800"
-            alt={
-              en
-                ? "People collaborating around a laptop to review a project"
-                : "Personas colaborando alrededor de un portátil para revisar un proyecto"
-            }
+            alt={hero.imgAlt}
             fetchpriority="high"
           />
           <div class="art-note">
@@ -125,55 +526,32 @@ const steps = en
               ✓
             </span>
             <div>
-              <strong>
-                {en ? "Your idea, taking shape" : "Tu idea, tomando forma"}
-              </strong>
-              <span>
-                {en
-                  ? "Built around what matters"
-                  : "Construida alrededor de lo importante"}
-              </span>
+              <strong>{hero.noteTitle}</strong>
+              <span>{hero.noteSubtitle}</span>
             </div>
           </div>
         </div>
       </section>
       <div class="focus-strip">
         <div class="container">
-          <span>
-            {en
-              ? "Made for businesses like yours"
-              : "Hecho para negocios como el tuyo"}
-          </span>
+          <span>{focusStrip.label}</span>
           <div>
-            {en ? "Local shops" : "Comercios"}
-            <i>✳</i>
-            {en ? "Independent professionals" : "Profesionales"}
-            <i>✳</i>
-            {en ? "Service businesses" : "Servicios"}
-            <i>✳</i>
-            {en ? "New ventures" : "Emprendimientos"}
+            {focusStrip.items.map((item, idx) => (
+              <>
+                {item}
+                {idx < focusStrip.items.length - 1 && <i>✳</i>}
+              </>
+            ))}
           </div>
         </div>
       </div>
       <section class="container section services" id="servicios">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">
-              {en
-                ? "What we can build together"
-                : "Lo que podemos crear juntos"}
-            </p>
-            <h2>
-              {en
-                ? "Big plans.\nThe right first step."
-                : "Grandes planes.\nEl primer paso correcto."}
-            </h2>
+            <p class="eyebrow">{services.eyebrow}</p>
+            <h2>{services.title}</h2>
           </div>
-          <p>
-            {en
-              ? "You don’t need every feature on day one. You need the right tools to start, learn and grow."
-              : "No necesitas todas las funciones desde el primer día. Necesitas las herramientas correctas para empezar, aprender y crecer."}
-          </p>
+          <p>{services.desc}</p>
         </div>
         <div class="service-grid">
           {content.services.map((s: any, i: number) => (
@@ -185,9 +563,9 @@ const steps = en
               <p>{s.description}</p>
               <a
                 href="#contacto"
-                aria-label={(en ? "Talk about " : "Conversar sobre ") + s.title}
+                aria-label={services.talkAbout + s.title}
               >
-                {en ? "Let’s explore it" : "Exploremos tu idea"}{" "}
+                {services.explore}{" "}
                 <span aria-hidden="true">↗</span>
               </a>
             </article>
@@ -201,60 +579,26 @@ const steps = en
               src="/images/mvp-validation.webp"
               width="1200"
               height="800"
-              alt={
-                en
-                  ? "Two people discuss an idea while reviewing a laptop"
-                  : "Dos personas conversan sobre una idea mientras revisan un portátil"
-              }
+              alt={mvp.imgAlt}
               loading="lazy"
               decoding="async"
             />
-            <span class="learn-label">
-              {en ? "Build → learn → grow" : "Crear → aprender → crecer"}
-            </span>
+            <span class="learn-label">{mvp.learnLabel}</span>
           </div>
           <div>
-            <p class="eyebrow">
-              {en
-                ? "Start small. Think ahead."
-                : "Empieza pequeño. Piensa a futuro."}
-            </p>
-            <h2>
-              {en
-                ? "Less guesswork.\nMore real learning."
-                : "Menos suposiciones.\nMás aprendizaje real."}
-            </h2>
-            <p class="lead">
-              {en
-                ? "An MVP is the simplest version of your product that solves a real problem. We help you focus your investment where it matters first."
-                : "Un MVP es la versión más sencilla de tu producto que resuelve un problema real. Te ayudamos a enfocar tu inversión en lo que importa primero."}
-            </p>
+            <p class="eyebrow">{mvp.eyebrow}</p>
+            <h2>{mvp.title}</h2>
+            <p class="lead">{mvp.lead}</p>
             <ul class="check-list">
-              <li>
-                {en
-                  ? "Validate your idea with real customers"
-                  : "Valida tu idea con clientes reales"}
-              </li>
-              <li>
-                {en
-                  ? "Keep the first release focused"
-                  : "Mantén enfocada tu primera versión"}
-              </li>
-              <li>
-                {en
-                  ? "Grow from what you learn"
-                  : "Crece a partir de lo que aprendes"}
-              </li>
+              {mvp.checks.map((chk) => (
+                <li>{chk}</li>
+              ))}
             </ul>
             <a
               class="text-link"
-              href={
-                prefix +
-                "/blog/" +
-                (en ? "why-your-business-needs-an-mvp" : "empezar-con-un-mvp")
-              }
+              href={prefix + "/blog/" + mvp.articleSlug}
             >
-              {en ? "Learn more about MVPs" : "Conoce más sobre los MVP"} ↗
+              {mvp.learnMore} ↗
             </a>
           </div>
         </div>
@@ -262,23 +606,13 @@ const steps = en
       <section class="container section" id="proceso">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">
-              {en ? "A shared journey" : "Un camino compartido"}
-            </p>
-            <h2>
-              {en
-                ? "From the first conversation\nto your first launch."
-                : "De la primera conversación\nal primer lanzamiento."}
-            </h2>
+            <p class="eyebrow">{proc.eyebrow}</p>
+            <h2>{proc.title}</h2>
           </div>
-          <p>
-            {en
-              ? "Clear communication and decisions we make together. You know what we’re building and why."
-              : "Comunicación clara y decisiones que tomamos juntos. Sabes qué estamos construyendo y por qué."}
-          </p>
+          <p>{proc.desc}</p>
         </div>
         <div class="steps">
-          {steps.map(([title, desc], i) => (
+          {proc.steps.map(([title, desc], i) => (
             <article>
               <span class="step-number">0{i + 1}</span>
               <h3>{title}</h3>
@@ -291,19 +625,11 @@ const steps = en
         <div class="container section">
           <div class="section-heading">
             <div>
-              <p class="eyebrow">
-                {en
-                  ? "Ideas to move forward"
-                  : "Ideas para dar el siguiente paso"}
-              </p>
-              <h2>
-                {en
-                  ? "A little clarity\nfor your big idea."
-                  : "Un poco de claridad\npara tu gran idea."}
-              </h2>
+              <p class="eyebrow">{blogSec.eyebrow}</p>
+              <h2>{blogSec.title}</h2>
             </div>
             <a class="text-link" href={prefix + "/blog"}>
-              {en ? "All articles" : "Todos los artículos"} ↗
+              {blogSec.allArticles} ↗
             </a>
           </div>
           <div class="post-grid">
@@ -320,15 +646,13 @@ const steps = en
                     alt={p.image_alt}
                     loading="lazy"
                   />
-                  <span>
-                    {en ? "Starting a business" : "Emprender con tecnología"}
-                  </span>
+                  <span>{blogSec.tag}</span>
                 </div>
                 <div class="post-copy">
                   <h3>{p.title}</h3>
                   <p>{p.excerpt}</p>
                   <span class="text-link">
-                    {en ? "Read article" : "Leer artículo"} ↗
+                    {blogSec.readArticle} ↗
                   </span>
                 </div>
               </a>
@@ -338,34 +662,18 @@ const steps = en
       </section>
       <section class="container section contact-layout" id="contacto">
         <div>
-          <p class="eyebrow">
-            {en
-              ? "Your next step starts here"
-              : "Tu siguiente paso empieza aquí"}
-          </p>
-          <h2>
-            {en
-              ? "You bring the idea.\nLet’s build what’s next."
-              : "Tú pones la idea.\nConstruyamos lo que sigue."}
-          </h2>
-          <p class="lead">
-            {en
-              ? "Tell us what you have in mind, even if it’s still on a napkin. We’ll explore a practical first version together."
-              : "Cuéntanos lo que tienes en mente, aunque todavía esté en una servilleta. Juntos exploraremos una primera versión posible."}
-          </p>
+          <p class="eyebrow">{contact.eyebrow}</p>
+          <h2>{contact.title}</h2>
+          <p class="lead">{contact.lead}</p>
           <div class="contact-note">
             <span aria-hidden="true">↗</span>
-            <p>
-              {en
-                ? "No need for a technical brief. Start with your business and the problem you want to solve."
-                : "No necesitas un documento técnico. Empieza por tu negocio y el problema que quieres resolver."}
-            </p>
+            <p>{contact.note}</p>
           </div>
         </div>
-        <form id="contact-form" class="contact-form" data-lang={lang}>
+        <form id="contact-form" class="contact-form" data-lang={currentLang}>
           <div class="form-row">
             <label>
-              {en ? "Your name" : "Tu nombre"}
+              {contact.nameLabel}
               <input
                 name="name"
                 autocomplete="name"
@@ -375,7 +683,7 @@ const steps = en
               />
             </label>
             <label>
-              {en ? "Your email" : "Tu correo"}
+              {contact.emailLabel}
               <input
                 name="email"
                 type="email"
@@ -386,36 +694,28 @@ const steps = en
             </label>
           </div>
           <label>
-            {en ? "Business name (optional)" : "Nombre del negocio (opcional)"}
+            {contact.companyLabel}
             <input name="company" autocomplete="organization" maxlength="150" />
           </label>
           <label>
-            {en ? "What do you have in mind?" : "¿Qué tienes en mente?"}
+            {contact.serviceLabel}
             <select name="service" required>
-              <option value="">
-                {en ? "Choose a service" : "Elige un servicio"}
-              </option>
+              <option value="">{contact.chooseService}</option>
               {content.services.map((s: any) => (
                 <option>{s.title}</option>
               ))}
-              <option>
-                {en ? "Help defining my MVP" : "Ayuda para definir mi MVP"}
-              </option>
+              <option>{contact.helpMvp}</option>
             </select>
           </label>
           <label>
-            {en ? "Tell us about your idea" : "Cuéntanos tu idea"}
+            {contact.messageLabel}
             <textarea
               name="message"
               rows="4"
               required
               minlength="20"
               maxlength="5000"
-              placeholder={
-                en
-                  ? "What would you like to solve for your customers?"
-                  : "¿Qué te gustaría resolver para tus clientes?"
-              }
+              placeholder={contact.placeholder}
             ></textarea>
           </label>
           <div class="honey" aria-hidden="true">
@@ -427,17 +727,15 @@ const steps = en
           <label class="checkbox">
             <input type="checkbox" name="consent" required />
             <span>
-              {en ? "I have read the" : "He leído la"}{" "}
-              <a href={en ? "/en/privacy-policy" : "/politica-de-privacidad"}>
-                {en ? "privacy policy" : "política de privacidad"}
+              {contact.consentPrefix}{" "}
+              <a href={contact.privacyLink}>
+                {contact.privacyLabel}
               </a>{" "}
-              {en
-                ? "and agree to be contacted about my request."
-                : "y acepto que me contacten sobre mi solicitud."}
+              {contact.consentSuffix}
             </span>
           </label>
           <button class="button" type="submit">
-            {en ? "Send my idea" : "Enviar mi idea"} ↗
+            {contact.submitButton} ↗
           </button>
           <p id="form-status" role="status" aria-live="polite"></p>
         </form>
@@ -450,9 +748,32 @@ const steps = en
       e.preventDefault();
       const button = form.querySelector("button")!;
       const status = document.querySelector("#form-status")!;
-      const en = form.dataset.lang === "en";
+      const lang = form.dataset.lang || "es";
+      
+      const sendingMsg: Record<string, string> = {
+        es: "Enviando…",
+        en: "Sending…",
+        fr: "Envoi en cours…",
+        de: "Wird gesendet…",
+        pt: "Enviando…",
+      };
+      const successMsg: Record<string, string> = {
+        es: "Tu idea ya está en nuestra bandeja. Gracias por compartirla.",
+        en: "Your idea is in our inbox. Thank you for telling us about it.",
+        fr: "Votre idée est bien arrivée. Merci de l'avoir partagée avec nous.",
+        de: "Ihre Idee ist eingegangen. Vielen Dank für Ihre Nachricht.",
+        pt: "Sua ideia já está na nossa caixa de entrada. Obrigado por compartilhar.",
+      };
+      const errorMsg: Record<string, string> = {
+        es: "No pudimos enviar tu solicitud. Revisa los campos e intenta nuevamente en unos minutos.",
+        en: "We couldn’t send your request. Check the fields and try again shortly.",
+        fr: "Impossible d'envoyer votre demande. Vérifiez les champs et réessayez dans quelques instants.",
+        de: "Ihre Anfrage konnte nicht gesendet werden. Bitte Felder prüfen und kurz warten.",
+        pt: "Não foi possível enviar sua solicitação. Verifique os campos e tente novamente em instantes.",
+      };
+
       button.disabled = true;
-      status.textContent = en ? "Sending…" : "Enviando…";
+      status.textContent = sendingMsg[lang] || sendingMsg.es;
       const values = Object.fromEntries(new FormData(form));
       try {
         const r = await fetch("/api/contact", {
@@ -466,13 +787,9 @@ const steps = en
         });
         if (!r.ok) throw new Error();
         form.reset();
-        status.textContent = en
-          ? "Your idea is in our inbox. Thank you for telling us about it."
-          : "Tu idea ya está en nuestra bandeja. Gracias por compartirla.";
+        status.textContent = successMsg[lang] || successMsg.es;
       } catch {
-        status.textContent = en
-          ? "We couldn’t send your request. Check the fields and try again shortly."
-          : "No pudimos enviar tu solicitud. Revisa los campos e intenta nuevamente en unos minutos.";
+        status.textContent = errorMsg[lang] || errorMsg.es;
       } finally {
         button.disabled = false;
       }

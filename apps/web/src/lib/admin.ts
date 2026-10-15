@@ -205,7 +205,7 @@ function editPost(p?: any) {
   $("#post-preview").setAttribute("src", p?.image || "/images/mvp-studio.webp");
   const link = $<HTMLAnchorElement>("#post-public-link");
   link.hidden = !p?.published;
-  if (p) link.href = (p.locale === "en" ? "/en" : "") + "/blog/" + p.slug;
+  if (p) link.href = (p.locale === "es" ? "" : "/" + p.locale) + "/blog/" + p.slug;
 }
 const siteForm = $<HTMLFormElement>("#site-form");
 function loadSite() {

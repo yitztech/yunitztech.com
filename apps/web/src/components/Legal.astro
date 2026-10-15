@@ -5,16 +5,14 @@ import {
   formatJurisdiction,
   cleanLegalText,
 } from "../lib/legal";
+
+const supportedLocales = ["es", "en", "fr", "de", "pt"] as const;
+type Locale = (typeof supportedLocales)[number];
+
 const { lang = "es", type = "privacy" } = Astro.props;
-const en = lang === "en";
+const currentLang = (supportedLocales.includes(lang as any) ? lang : "es") as Locale;
 const privacy = type === "privacy";
-const title = privacy
-  ? en
-    ? "Privacy policy"
-    : "Política de privacidad"
-  : en
-    ? "Terms of service"
-    : "Condiciones de servicio";
+
 const owner = process.env.LEGAL_NAME?.trim();
 const rawCountry = process.env.LEGAL_COUNTRY;
 const country = cleanLegalText(rawCountry);
@@ -22,184 +20,341 @@ const email = process.env.PRIVACY_EMAIL?.trim();
 const rawAddress = process.env.LEGAL_ADDRESS;
 const address = cleanLegalText(rawAddress);
 const complete = Boolean(owner && country && email && address);
-const alternate = privacy
-  ? en
-    ? "/politica-de-privacidad"
-    : "/en/privacy-policy"
-  : en
-    ? "/condiciones-de-servicio"
-    : "/en/terms-of-service";
+
+const alternates = privacy
+  ? {
+      es: "/politica-de-privacidad",
+      en: "/en/privacy-policy",
+      fr: "/fr/politique-de-confidentialite",
+      de: "/de/datenschutzerklaerung",
+      pt: "/pt/politica-de-privacidade",
+    }
+  : {
+      es: "/condiciones-de-servicio",
+      en: "/en/terms-of-service",
+      fr: "/fr/conditions-de-service",
+      de: "/de/nutzungsbedingungen",
+      pt: "/pt/termos-de-servico",
+    };
+
+const alternate = currentLang === "es" ? alternates.en : alternates.es;
+
+const pendingAddressPlaceholder: Record<Locale, string> = {
+  es: "[Pendiente]",
+  en: "[Pending]",
+  fr: "[En attente]",
+  de: "[Ausstehend]",
+  pt: "[Pendente]",
+};
+
+const pendingJurisdictionPlaceholder: Record<Locale, string> = {
+  es: "[Jurisdicción pendiente]",
+  en: "[Jurisdiction pending]",
+  fr: "[Juridiction en attente]",
+  de: "[Gerichtsstand ausstehend]",
+  pt: "[Jurisdição pendente]",
+};
+
+const pendingOwner: Record<Locale, string> = {
+  es: "[Razón social pendiente]",
+  en: "[Legal name pending]",
+  fr: "[Raison sociale en attente]",
+  de: "[Firmenname ausstehend]",
+  pt: "[Razão social pendente]",
+};
+
+const pendingPrivacyEmail: Record<Locale, string> = {
+  es: "[Correo de privacidad pendiente]",
+  en: "[Privacy email pending]",
+  fr: "[E-mail de confidentialité en attente]",
+  de: "[Datenschutz-E-Mail ausstehend]",
+  pt: "[E-mail de privacidade pendente]",
+};
+
+const pendingContactEmail: Record<Locale, string> = {
+  es: "[Correo de contacto pendiente]",
+  en: "[Contact email pending]",
+  fr: "[E-mail de contact en attente]",
+  de: "[Kontakt-E-Mail ausstehend]",
+  pt: "[E-mail de contato pendente]",
+};
+
+const addressLabel: Record<Locale, string> = {
+  es: "Domicilio:",
+  en: "Address:",
+  fr: "Adresse :",
+  de: "Anschrift:",
+  pt: "Endereço:",
+};
+
 const legalAddressDisplay = formatLegalAddress(
   rawAddress,
   rawCountry,
-  en ? "[Pending]" : "[Pendiente]",
+  pendingAddressPlaceholder[currentLang],
 );
+
 const jurisdictionDisplay = formatJurisdiction(
   rawCountry,
-  en ? "[Jurisdiction pending]" : "[Jurisdicción pendiente]",
+  pendingJurisdictionPlaceholder[currentLang],
 );
+
+const titles: Record<Locale, { privacy: string; terms: string }> = {
+  es: { privacy: "Política de privacidad", terms: "Condiciones de servicio" },
+  en: { privacy: "Privacy policy", terms: "Terms of service" },
+  fr: { privacy: "Politique de confidentialité", terms: "Conditions de service" },
+  de: { privacy: "Datenschutzerklärung", terms: "Nutzungsbedingungen" },
+  pt: { privacy: "Política de privacidade", terms: "Termos de serviço" },
+};
+
+const descriptions: Record<Locale, string> = {
+  es: "Cómo YunitzTech trata las solicitudes, los datos personales y el uso de este sitio.",
+  en: "How YunitzTech handles requests, personal information and use of this website.",
+  fr: "Comment YunitzTech traite les demandes, les données personnelles et l'utilisation de ce site.",
+  de: "Wie YunitzTech Anfragen, personenbezogene Daten und die Nutzung dieser Website handhabt.",
+  pt: "Como a YunitzTech trata solicitações, dados pessoais e o uso deste site.",
+};
+
+const lastUpdatedTexts: Record<Locale, string> = {
+  es: "Última actualización: 26 de septiembre de 2026.",
+  en: "Last updated: September 26, 2026.",
+  fr: "Dernière mise à jour : 26 septembre 2026.",
+  de: "Zuletzt aktualisiert: 26. September 2026.",
+  pt: "Última atualização: 26 de setembro de 2026.",
+};
+
+const draftNotices: Record<Locale, string> = {
+  es: "Borrador pendiente de datos del titular y revisión de jurisdicción antes del lanzamiento público. Falta completar la razón social responsable, domicilio, país y correo de privacidad.",
+  en: "Draft pending owner details and jurisdiction review before public launch. The responsible legal entity, address, country and privacy email must be completed.",
+  fr: "Projet en attente des coordonnées du titulaire et de l'examen de juridiction avant lancement public. La raison sociale, l'adresse, le pays et l'e-mail de confidentialité doivent être complétés.",
+  de: "Entwurf vorbehaltlich Angaben des Inhabers und rechtlicher Prüfung vor Veröffentlichung. Firmenname, Anschrift, Land und Datenschutz-E-Mail müssen noch ergänzt werden.",
+  pt: "Borrador pendente de dados do titular e revisão de jurisdição antes do lançamento público. Falta preencher a razão social responsável, endereço, país e e-mail de privacidade.",
+};
+
+const title = privacy ? titles[currentLang].privacy : titles[currentLang].terms;
 ---
 
 <Layout
-  lang={lang}
+  lang={currentLang}
   title={title + " | YunitzTech"}
-  description={
-    en
-      ? "How YunitzTech handles requests, personal information and use of this website."
-      : "Cómo YunitzTech trata las solicitudes, los datos personales y el uso de este sitio."
-  }
+  description={descriptions[currentLang]}
   alternate={alternate}
+  alternates={alternates}
   noindex={!complete}
 >
   <div class="container">
     <article class="prose">
       <h1>{title}</h1>
-      <p>
-        {en
-          ? "Last updated: September 26, 2026."
-          : "Última actualización: 26 de septiembre de 2026."}
-      </p>
+      <p>{lastUpdatedTexts[currentLang]}</p>
       {!complete && (
-        <p class="notice">
-          {en
-            ? "Draft pending owner details and jurisdiction review before public launch. The responsible legal entity, address, country and privacy email must be completed."
-            : "Borrador pendiente de datos del titular y revisión de jurisdicción antes del lanzamiento público. Falta completar la razón social responsable, domicilio, país y correo de privacidad."}
-        </p>
+        <p class="notice">{draftNotices[currentLang]}</p>
       )}
       {privacy ? (
         <>
-          <h2>{en ? "Who is responsible" : "Quién es responsable"}</h2>
+          <h2>
+            {currentLang === "en" ? "Who is responsible" :
+             currentLang === "fr" ? "Qui est responsable" :
+             currentLang === "de" ? "Wer verantwortlich ist" :
+             currentLang === "pt" ? "Quem é responsável" :
+             "Quién es responsable"}
+          </h2>
           <p>
-            {en
-              ? "This website operates under the YunitzTech brand. The party responsible for handling personal information is:"
-              : "Este sitio opera bajo la marca YunitzTech. El responsable del tratamiento de datos personales es:"}{" "}
-            {owner ||
-              (en ? "[Legal name pending]" : "[Razón social pendiente]")}
-            . {en ? "Address:" : "Domicilio:"}{" "}
+            {currentLang === "en" ? "This website operates under the YunitzTech brand. The party responsible for handling personal information is:" :
+             currentLang === "fr" ? "Ce site fonctionne sous la marque YunitzTech. Le responsable du traitement des données personnelles est :" :
+             currentLang === "de" ? "Diese Website wird unter der Marke YunitzTech betrieben. Verantwortlich für die Verarbeitung personenbezogener Daten ist:" :
+             currentLang === "pt" ? "Este site opera sob a marca YunitzTech. O responsável pelo tratamento de dados pessoais é:" :
+             "Este sitio opera bajo la marca YunitzTech. El responsable del tratamiento de datos personales es:"}{" "}
+            {owner || pendingOwner[currentLang]}
+            . {addressLabel[currentLang]}{" "}
             {legalAddressDisplay}
           </p>
-          <h2>{en ? "Information we collect" : "Información que recabamos"}</h2>
-          <p>
-            {en
-              ? "When you send the contact form, we receive your name, email address, optional business name, selected service, message, language, submission time and the version of the consent notice. Please do not include sensitive information or passwords."
-              : "Al enviar el formulario recibimos tu nombre, correo electrónico, nombre opcional del negocio, servicio seleccionado, mensaje, idioma, fecha de envío y versión del aviso aceptado. No incluyas datos sensibles ni contraseñas."}
-          </p>
-          <h2>{en ? "Why we use it" : "Para qué la utilizamos"}</h2>
-          <p>
-            {en
-              ? "We use this information to review and respond to your request, discuss a potential project and manage follow-up. Sending this form does not subscribe you to a mailing list. Any marketing subscription requires a separate, voluntary choice."
-              : "Utilizamos esta información para revisar y responder tu solicitud, conversar sobre un posible proyecto y gestionar su seguimiento. Enviar el formulario no te suscribe a una lista de correos. Cualquier suscripción comercial requiere una elección voluntaria por separado."}
-          </p>
           <h2>
-            {en
-              ? "Site statistics and cookies"
-              : "Estadísticas del sitio y cookies"}
+            {currentLang === "en" ? "Information we collect" :
+             currentLang === "fr" ? "Informations que nous recueillons" :
+             currentLang === "de" ? "Informationen, die wir erfassen" :
+             currentLang === "pt" ? "Informações que coletamos" :
+             "Información que recabamos"}
           </h2>
           <p>
-            {en
-              ? "We measure activity using our own aggregate site statistics and a privacy-preserving instance of Umami (stats.yunitztech.com). We count visits by day, public page and referring website domain. Neither system stores visitor IP addresses, full referring URLs or persistent visitor identifiers, nor uses tracking cookies on the public site. These totals are aggregate page views, not unique individuals, and may include bots. We do not determine precise location or country. We respect browser Do Not Track and Global Privacy Control signals. The public site does not use tracking cookies. The administration panel uses a secure session cookie lasting up to eight hours."
-              : "Medimos la actividad mediante estadísticas agregadas propias del sitio y una instancia privada de Umami (stats.yunitztech.com). Contamos visitas por día, página pública y dominio del sitio de procedencia. Ninguno de los dos sistemas guarda direcciones IP, URL completas de referencia ni identificadores persistentes de visitantes, ni utiliza cookies de rastreo en el sitio público. Estos totales son vistas agregadas, no personas únicas, y pueden incluir bots. No determinamos ubicación precisa ni país. Respetamos las señales Do Not Track y Global Privacy Control del navegador. El sitio público no utiliza cookies de rastreo. El panel de administración utiliza una cookie de sesión de hasta ocho horas."}
+            {currentLang === "en" ? "When you send the contact form, we receive your name, email address, optional business name, selected service, message, language, submission time and the version of the consent notice. Please do not include sensitive information or passwords." :
+             currentLang === "fr" ? "Lors de l'envoi du formulaire de contact, nous recevons votre nom, adresse e-mail, nom éventuel de l'entreprise, service sélectionné, message, langue, date et heure d'envoi et version du consentement accepté. Veuillez ne pas inclure d'informations sensibles ni de mots de passe." :
+             currentLang === "de" ? "Wenn Sie das Kontaktformular absenden, erhalten wir Ihren Namen, Ihre E-Mail-Adresse, den optionalen Unternehmensnamen, den gewählten Dienst, Ihre Nachricht, die Sprache, den Sendezeitpunkt und die Version der Zustimmungserklärung. Bitte keine sensiblen Daten oder Passwörter angeben." :
+             currentLang === "pt" ? "Ao enviar o formulário, recebemos seu nome, e-mail, nome opcional do negócio, serviço selecionado, mensagem, idioma, data de envio e versão do aviso aceito. Não inclua dados sensíveis nem senhas." :
+             "Al enviar el formulario recibimos tu nombre, correo electrónico, nombre opcional del negocio, servicio seleccionado, mensaje, idioma, fecha de envío y versión del aviso aceptado. No incluyas datos sensibles ni contraseñas."}
           </p>
           <h2>
-            {en
-              ? "Storage, providers and retention"
-              : "Almacenamiento, proveedores y conservación"}
+            {currentLang === "en" ? "Why we use it" :
+             currentLang === "fr" ? "Pourquoi nous l'utilisons" :
+             currentLang === "de" ? "Wofür wir sie verwenden" :
+             currentLang === "pt" ? "Para que a utilizamos" :
+             "Para qué la utilizamos"}
           </h2>
           <p>
-            {en
-              ? "Information is stored in the website database. Hosting and infrastructure providers may process technical connection information to operate and protect the service; access is limited to what is necessary. Contact requests are automatically removed from the active database after twelve months and can be deleted earlier on request. Statistics are retained for ninety days. Expired administration sessions are removed daily. Backup deletion must follow the hosting operator’s documented retention schedule. We do not sell personal information."
-              : "La información se almacena en la base de datos del sitio. Los proveedores de alojamiento e infraestructura pueden procesar información técnica de conexión para operar y proteger el servicio; el acceso se limita a lo necesario. Las solicitudes se eliminan automáticamente de la base activa después de doce meses y pueden eliminarse antes a petición. Las estadísticas se conservan noventa días. Las sesiones vencidas se eliminan diariamente. La eliminación en respaldos debe seguir el calendario documentado del operador del alojamiento. No vendemos información personal."}
+            {currentLang === "en" ? "We use this information to review and respond to your request, discuss a potential project and manage follow-up. Sending this form does not subscribe you to a mailing list. Any marketing subscription requires a separate, voluntary choice." :
+             currentLang === "fr" ? "Nous utilisons ces informations pour examiner et répondre à votre demande, discuter d'un projet potentiel et en assurer le suivi. L'envoi du formulaire ne vous inscrit pas à une liste de diffusion. Tout abonnement commercial nécessite un choix volontaire distinct." :
+             currentLang === "de" ? "Wir nutzen diese Informationen, um Ihre Anfrage zu prüfen und zu beantworten, ein mögliches Projekt zu besprechen und die Nachverfolgung zu koordinieren. Das Absenden des Formulars führt zu keinem Newsletter-Abonnement. Jede werbliche Ansprache erfordert eine gesonderte, freiwillige Zustimmung." :
+             currentLang === "pt" ? "Utilizamos essas informações para analisar e responder à sua solicitação, conversar sobre um projeto em potencial e gerenciar o acompanhamento. Enviar o formulário não cadastra você em lista de e-mails. Qualquer assinatura comercial requer uma escolha voluntária separada." :
+             "Utilizamos esta información para revisar y responder tu solicitud, conversar sobre un posible proyecto y gestionar su seguimiento. Enviar el formulario no te suscribe a una lista de correos. Cualquier suscripción comercial requiere una elección voluntaria por separado."}
           </p>
           <h2>
-            {en ? "Your choices and requests" : "Tus decisiones y solicitudes"}
+            {currentLang === "en" ? "Site statistics and cookies" :
+             currentLang === "fr" ? "Statistiques du site et cookies" :
+             currentLang === "de" ? "Websitestatistiken und Cookies" :
+             currentLang === "pt" ? "Estatísticas do site e cookies" :
+             "Estadísticas del sitio y cookies"}
           </h2>
           <p>
-            {en
-              ? "You may request access, correction, deletion or objection to processing, withdraw consent and ask about the use of your information by contacting:"
-              : "Puedes solicitar acceso, rectificación, cancelación u oposición al tratamiento, retirar tu consentimiento y consultar el uso de tu información escribiendo a:"}{" "}
+            {currentLang === "en" ? "We measure activity using our own aggregate site statistics and a privacy-preserving instance of Umami (stats.yunitztech.com). We count visits by day, public page and referring website domain. Neither system stores visitor IP addresses, full referring URLs or persistent visitor identifiers, nor uses tracking cookies on the public site. These totals are aggregate page views, not unique individuals, and may include bots. We do not determine precise location or country. We respect browser Do Not Track and Global Privacy Control signals. The public site does not use tracking cookies. The administration panel uses a secure session cookie lasting up to eight hours." :
+             currentLang === "fr" ? "Nous mesurons l'activité grâce à nos propres statistiques agrégées et à une instance respectueuse de la vie privée d'Umami (stats.yunitztech.com). Nous comptons les visites par jour, page publique et domaine référent. Aucun de ces systèmes n'enregistre d'adresses IP, d'URL de provenance complètes ni d'identifiants persistants, et aucun cookie de suivi n'est utilisé sur le site public. Ces totaux sont des vues agrégées, non des personnes uniques, et peuvent inclure des robots. Nous ne déterminons pas de géolocalisation précise ni de pays. Nous respectons les signaux Do Not Track et Global Privacy Control des navigateurs. Le site public n'utilise aucun cookie de suivi. Le panneau d'administration utilise un cookie de session d'une durée maximale de huit heures." :
+             currentLang === "de" ? "Wir messen die Aktivität über eigene aggregierte Websitestatistiken sowie eine datenschutzfreundliche Instanz von Umami (stats.yunitztech.com). Wir zählen Aufrufe nach Tag, öffentlicher Seite und verweisender Domain. Keines der Systeme speichert IP-Adressen, vollständige Referrer-URLs oder dauerhafte Nutzerkennungen, und auf der öffentlichen Website werden keine Tracking-Cookies eingesetzt. Diese Gesamtzahlen sind aggregierte Seitenaufrufe, keine individuellen Besucher, und können Bots enthalten. Wir ermitteln weder den genauen Standort noch das Land. Wir respektieren Do-Not-Track- und Global-Privacy-Control-Signale des Browsers. Die öffentliche Website verwendet keine Tracking-Cookies. Der Administrationsbereich nutzt ein sicheres Sitzungscookie für maximal acht Stunden." :
+             currentLang === "pt" ? "Medimos a atividade por meio de estatísticas agregadas próprias do site e de uma instância privada do Umami (stats.yunitztech.com). Contabilizamos visitas por dia, página pública e domínio de origem. Nenhum dos sistemas armazena endereços IP, URLs completas de referência ou identificadores persistentes de visitantes, nem utiliza cookies de rastreamento no site público. Esses totais representam visualizações agregadas, não pessoas únicas, e podem incluir bots. Não determinamos localização exata nem país. Respeitamos os sinais Do Not Track e Global Privacy Control do navegador. O site público não utiliza cookies de rastreamento. O painel administrativo usa um cookie de sessão seguro com duração de até oito horas." :
+             "Medimos la actividad mediante estadísticas agregadas propias del sitio y una instancia privada de Umami (stats.yunitztech.com). Contamos visitas por día, página pública y dominio del sitio de procedencia. Ninguno de los dos sistemas guarda direcciones IP, URL completas de referencia ni identificadores persistentes de visitantes, ni utiliza cookies de rastreo en el sitio público. Estos totales son vistas agregadas, no personas únicas, y pueden incluir bots. No determinamos ubicación precisa ni país. Respetamos las señales Do Not Track y Global Privacy Control del navegador. El sitio público no utiliza cookies de rastreo. El panel de administración utiliza una cookie de sesión de hasta ocho horas."}
+          </p>
+          <h2>
+            {currentLang === "en" ? "Storage, providers and retention" :
+             currentLang === "fr" ? "Stockage, prestataires et conservation" :
+             currentLang === "de" ? "Speicherung, Dienstleister und Aufbewahrung" :
+             currentLang === "pt" ? "Armazenamento, fornecedores e retenção" :
+             "Almacenamiento, proveedores y conservación"}
+          </h2>
+          <p>
+            {currentLang === "en" ? "Information is stored in the website database. Hosting and infrastructure providers may process technical connection information to operate and protect the service; access is limited to what is necessary. Contact requests are automatically removed from the active database after twelve months and can be deleted earlier on request. Statistics are retained for ninety days. Expired administration sessions are removed daily. Backup deletion must follow the hosting operator’s documented retention schedule. We do not sell personal information." :
+             currentLang === "fr" ? "Les données sont conservées dans la base de données du site web. Les hébergeurs et prestataires d'infrastructure peuvent traiter des données techniques de connexion pour exploiter et sécuriser le service ; l'accès est strictement limité au nécessaire. Les demandes de contact sont automatiquement supprimées de la base active après douze mois et peuvent être effacées plus tôt sur simple demande. Les statistiques sont conservées quatre-vingt-dix jours. Les sessions d'administration expirées sont effacées quotidiennement. La suppression dans les sauvegardes suit le calendrier documenté de l'hébergeur. Nous ne vendons aucune information personnelle." :
+             currentLang === "de" ? "Die Daten werden in der Datenbank der Website gespeichert. Hosting- und Infrastrukturanbieter können technische Verbindungsdaten verarbeiten, um den Dienst zu betreiben und abzusichern; der Zugriff ist auf das Notwendige beschränkt. Kontaktanfragen werden nach zwölf Monaten automatisch aus der aktiven Datenbank gelöscht und können auf Wunsch früher entfernt werden. Statistiken werden für neunzig Tage aufbewahrt. Abgelaufene Admin-Sitzungen werden täglich gelöscht. Die Löschung in Backups folgt dem dokumentierten Zeitplan des Hosters. Wir verkaufen keine personenbezogenen Daten." :
+             currentLang === "pt" ? "As informações ficam armazenadas no banco de dados do site. Provedores de hospedagem e infraestrutura podem processar dados técnicos de conexão para operar e proteger o serviço; o acesso é limitado ao estritamente necessário. As mensagens de contato são excluídas automaticamente do banco ativo após doze meses e podem ser apagadas antes mediante solicitação. As estatísticas são mantidas por noventa dias. Sessões administrativas expiradas são removidas diariamente. A exclusão em cópias de segurança deve seguir o cronograma do operador de hospedagem. Não vendemos dados pessoais." :
+             "La información se almacena en la base de datos del sitio. Los proveedores de alojamiento e infraestructura pueden procesar información técnica de conexión para operar y proteger el servicio; el acceso se limita a lo necesario. Las solicitudes se eliminan automáticamente de la base activa después de doce meses y pueden eliminarse antes a petición. Las estadísticas se conservan noventa días. Las sesiones vencidas se eliminan diariamente. La eliminación en respaldos debe seguir el calendario documentado del operador del alojamiento. No vendemos información personal."}
+          </p>
+          <h2>
+            {currentLang === "en" ? "Your choices and requests" :
+             currentLang === "fr" ? "Vos choix et demandes" :
+             currentLang === "de" ? "Ihre Rechte und Anfragen" :
+             currentLang === "pt" ? "Suas decisões e solicitações" :
+             "Tus decisiones y solicitudes"}
+          </h2>
+          <p>
+            {currentLang === "en" ? "You may request access, correction, deletion or objection to processing, withdraw consent and ask about the use of your information by contacting:" :
+             currentLang === "fr" ? "Vous pouvez demander l'accès, la rectification, l'effacement ou l'opposition au traitement, retirer votre consentement et vous renseigner sur l'utilisation de vos données en écrivant à :" :
+             currentLang === "de" ? "Sie können Auskunft, Berichtigung, Löschung oder Widerspruch gegen die Verarbeitung verlangen, Ihre Einwilligung widerrufen und Auskunft über die Nutzung Ihrer Daten erhalten unter:" :
+             currentLang === "pt" ? "Você pode solicitar acesso, retificação, cancelamento ou oposição ao tratamento, retirar seu consentimento e consultar o uso das suas informações escrevendo para:" :
+             "Puedes solicitar acceso, rectificación, cancelación u oposición al tratamiento, retirar tu consentimiento y consultar el uso de tu información escribiendo a:"}{" "}
             {email ? (
               <a href={"mailto:" + email}>{email}</a>
-            ) : en ? (
-              "[Privacy email pending]"
             ) : (
-              "[Correo de privacidad pendiente]"
+              pendingPrivacyEmail[currentLang]
             )}
             .{" "}
-            {en
-              ? "Describe your request and provide enough information to locate the original submission. We may request proportionate identity verification. Applicable procedures and deadlines depend on the confirmed jurisdiction."
-              : "Describe tu solicitud y proporciona información suficiente para localizar el envío original. Podemos solicitar una verificación de identidad proporcional. Los procedimientos y plazos aplicables dependen de la jurisdicción que se confirme."}
+            {currentLang === "en" ? "Describe your request and provide enough information to locate the original submission. We may request proportionate identity verification. Applicable procedures and deadlines depend on the confirmed jurisdiction." :
+             currentLang === "fr" ? "Décrivez votre demande et fournissez suffisamment d'éléments pour identifier l'envoi initial. Nous pouvons solliciter une vérification d'identité proportionnée. Les procédures et délais applicables dépendent de la juridiction confirmée." :
+             currentLang === "de" ? "Beschreiben Sie Ihr Anliegen und geben Sie ausreichende Informationen an, um die ursprüngliche Einsendung zuzuordnen. Wir können eine verhältnismäßige Identitätsprüfung verlangen. Die Verfahren und Fristen richten sich nach der bestätigten Rechtsordnung." :
+             currentLang === "pt" ? "Descreva sua solicitação e forneça dados suficientes para localizar o envio original. Podemos solicitar uma verificação de identidade proporcional. Os procedimentos e prazos aplicáveis dependem da jurisdição confirmada." :
+             "Describe tu solicitud y proporciona información suficiente para localizar el envío original. Podemos solicitar una verificación de identidad proporcional. Los procedimientos y plazos aplicables dependen de la jurisdicción que se confirme."}
           </p>
-          <h2>{en ? "Changes to this policy" : "Cambios a esta política"}</h2>
+          <h2>
+            {currentLang === "en" ? "Changes to this policy" :
+             currentLang === "fr" ? "Modifications de cette politique" :
+             currentLang === "de" ? "Änderungen dieser Richtlinie" :
+             currentLang === "pt" ? "Alterações nesta política" :
+             "Cambios a esta política"}
+          </h2>
           <p>
-            {en
-              ? "We will publish changes here and update the date. Material changes to the purposes of processing may require new information or consent before being applied."
-              : "Publicaremos los cambios aquí y actualizaremos la fecha. Los cambios sustanciales en las finalidades del tratamiento pueden requerir información adicional o nuevo consentimiento antes de aplicarse."}
+            {currentLang === "en" ? "We will publish changes here and update the date. Material changes to the purposes of processing may require new information or consent before being applied." :
+             currentLang === "fr" ? "Nous publierons les modifications ici et mettrons à jour la date. Toute modification substantielle des finalités de traitement pourra donner lieu à une information préalable ou à un nouveau consentement." :
+             currentLang === "de" ? "Änderungen werden hier veröffentlicht und mit einem aktualisierten Datum versehen. Wesentliche Änderungen der Verarbeitungszwecke erfordern gegebenenfalls neue Informationen oder eine erneute Einwilligung vor ihrer Wirksamkeit." :
+             currentLang === "pt" ? "Publicaremos as alterações aqui e atualizaremos a data. Mudanças substanciais nas finalidades do tratamento podem exigir informações complementares ou novo consentimento antes de entrarem em vigor." :
+             "Publicaremos los cambios aquí y actualizaremos la fecha. Los cambios sustanciales en las finalidades del tratamiento pueden requerir información adicional o nuevo consentimiento antes de aplicarse."}
           </p>
         </>
       ) : (
         <>
-          <h2>{en ? "Website purpose" : "Objeto del sitio"}</h2>
-          <p>
-            {en
-              ? "YunitzTech presents digital product development services for small businesses, including MVPs, websites, online stores, booking systems and applications. Blog articles provide general educational information. They do not guarantee commercial results or replace advice tailored to your circumstances."
-              : "YunitzTech presenta servicios de desarrollo de productos digitales para mipymes, incluidos MVP, sitios web, tiendas en línea, reservaciones y aplicaciones. Los artículos del blog ofrecen información educativa general. No garantizan resultados comerciales ni sustituyen asesoría adecuada a tus circunstancias."}
-          </p>
           <h2>
-            {en
-              ? "Requests and project agreements"
-              : "Solicitudes y contratación de proyectos"}
+            {currentLang === "en" ? "Website purpose" :
+             currentLang === "fr" ? "Objet du site" :
+             currentLang === "de" ? "Gegenstand der Website" :
+             currentLang === "pt" ? "Objeto do site" :
+             "Objeto del sitio"}
           </h2>
           <p>
-            {en
-              ? "Sending a form starts a conversation and does not create a service contract or payment obligation. Scope, deliverables, fees, payment milestones, timelines, support and acceptance criteria must be agreed in a separate written proposal or contract. Third-party services and their costs must be identified in that agreement."
-              : "Enviar un formulario inicia una conversación y no crea un contrato de servicios ni una obligación de pago. El alcance, entregables, honorarios, hitos de pago, plazos, soporte y criterios de aceptación se acordarán en una propuesta o contrato escrito separado. Los servicios de terceros y sus costos deberán identificarse en ese acuerdo."}
-          </p>
-          <h2>{en ? "Acceptable use" : "Uso permitido"}</h2>
-          <p>
-            {en
-              ? "Use this website lawfully and provide accurate information when contacting us. Do not attempt unauthorized access, submit malicious files, impersonate another person or interfere with the service. Administration access is restricted to authorized personnel."
-              : "Utiliza este sitio lícitamente y proporciona información veraz al contactarnos. No intentes acceder sin autorización, enviar archivos maliciosos, suplantar a otra persona ni interferir con el servicio. El acceso a la administración está restringido a personal autorizado."}
+            {currentLang === "en" ? "YunitzTech presents digital product development services for small businesses, including MVPs, websites, online stores, booking systems and applications. Blog articles provide general educational information. They do not guarantee commercial results or replace advice tailored to your circumstances." :
+             currentLang === "fr" ? "YunitzTech présente des services de développement de produits numériques pour petites entreprises, notamment des MVP, sites web, boutiques en ligne, systèmes de réservation et applications. Les articles du blog fournissent des informations éducatives générales. Ils ne garantissent aucun résultat commercial et ne remplacent pas un conseil adapté à votre situation." :
+             currentLang === "de" ? "YunitzTech stellt Dienstleistungen zur Entwicklung digitaler Produkte für kleine Unternehmen vor, darunter MVPs, Websites, Onlineshops, Buchungssysteme und Anwendungen. Die Blogbeiträge bieten allgemeine Orientierung. Sie garantieren keine wirtschaftlichen Erfolge und ersetzen keine auf den Einzelfall abgestimmte Beratung." :
+             currentLang === "pt" ? "A YunitzTech apresenta serviços de desenvolvimento de produtos digitais para pequenas empresas, incluindo MVPs, sites, lojas virtuais, sistemas de agendamento e aplicativos. Os artigos do blog trazem informações educativas gerais. Não garantem resultados comerciais nem substituem consultoria especializada para o seu caso." :
+             "YunitzTech presenta servicios de desarrollo de productos digitales para mipymes, incluidos MVP, sitios web, tiendas en línea, reservaciones y aplicaciones. Los artículos del blog ofrecen información educativa general. No garantizan resultados comerciales ni sustituyen asesoría adecuada a tus circunstancias."}
           </p>
           <h2>
-            {en
-              ? "Content and intellectual property"
-              : "Contenido y propiedad intelectual"}
+            {currentLang === "en" ? "Requests and project agreements" :
+             currentLang === "fr" ? "Demandes et contractualisation de projets" :
+             currentLang === "de" ? "Anfragen und Projektverträge" :
+             currentLang === "pt" ? "Solicitações e contratação de projetos" :
+             "Solicitudes y contratación de proyectos"}
           </h2>
           <p>
-            {en
-              ? "Website content is available for reading and sharing through links. Reuse of protected material requires the relevant authorization unless permitted by law. Ownership and licensing of work created for clients will be defined in each project agreement; this page does not assign rights over a future project."
-              : "El contenido está disponible para lectura y para compartir mediante enlaces. La reutilización de materiales protegidos requiere la autorización correspondiente salvo que la ley la permita. La titularidad y las licencias de los trabajos creados para clientes se definirán en cada contrato; esta página no asigna derechos sobre un proyecto futuro."}
+            {currentLang === "en" ? "Sending a form starts a conversation and does not create a service contract or payment obligation. Scope, deliverables, fees, payment milestones, timelines, support and acceptance criteria must be agreed in a separate written proposal or contract. Third-party services and their costs must be identified in that agreement." :
+             currentLang === "fr" ? "L'envoi d'un formulaire engage un premier échange et ne crée aucun contrat de prestation ni obligation de paiement. Le périmètre, les livrables, les honoraires, les étapes de règlement, les calendriers, l'assistance et les critères de recette font l'objet d'un devis ou d'un contrat écrit distinct. Les services tiers et leurs coûts éventuels doivent y être identifiés." :
+             currentLang === "de" ? "Das Absenden eines Formulars leitet einen unverbindlichen Austausch ein und begründet keinen Dienstleistungsvertrag oder Zahlungsverpflichtungen. Leistungsumfang, Lieferergebnisse, Vergütung, Zahlungsmeilensteine, Zeitpläne, Support und Abnahmekriterien werden in einem separaten schriftlichen Angebot oder Vertrag vereinbart. Drittanbieterdienste und deren Kosten sind darin gesondert auszuweisen." :
+             currentLang === "pt" ? "O envio de um formulário inicia uma conversa e não estabelece contrato de prestação de serviços nem obrigação de pagamento. O escopo, entregáveis, valores, etapas de pagamento, prazos, suporte e critérios de aceitação serão acordados em proposta ou contrato escrito à parte. Serviços de terceiros e seus custos deverão ser discriminados no respectivo acordo." :
+             "Enviar un formulario inicia una conversación y no crea un contrato de servicios ni una obligación de pago. El alcance, entregables, honorarios, hitos de pago, plazos, soporte y criterios de aceptación se acordarán en una propuesta o contrato escrito separado. Los servicios de terceros y sus costos deberán identificarse en ese acuerdo."}
           </p>
           <h2>
-            {en
-              ? "Availability and external services"
-              : "Disponibilidad y servicios externos"}
+            {currentLang === "en" ? "Acceptable use" :
+             currentLang === "fr" ? "Utilisation autorisée" :
+             currentLang === "de" ? "Zulässige Nutzung" :
+             currentLang === "pt" ? "Uso permitido" :
+             "Uso permitido"}
           </h2>
           <p>
-            {en
-              ? "We work to keep information accurate and the website operational, but interruptions and corrections may occur. External services have their own terms. Nothing on this page excludes rights or liabilities that cannot legally be excluded."
-              : "Trabajamos para mantener la información correcta y el sitio operativo, pero pueden existir interrupciones y correcciones. Los servicios externos tienen condiciones propias. Nada en esta página excluye derechos o responsabilidades que legalmente no puedan excluirse."}
+            {currentLang === "en" ? "Use this website lawfully and provide accurate information when contacting us. Do not attempt unauthorized access, submit malicious files, impersonate another person or interfere with the service. Administration access is restricted to authorized personnel." :
+             currentLang === "fr" ? "Utilisez ce site de manière légitime et communiquez des informations véridiques lors de vos contacts. Ne tentez aucun accès non autorisé, n'envoyez pas de fichiers malveillants, n'usurpez pas d'identité et ne perturbez pas le fonctionnement du service. L'accès à l'administration est strictement réservé au personnel autorisé." :
+             currentLang === "de" ? "Nutzen Sie diese Website im rechtlich zulässigen Rahmen und machen Sie bei der Kontaktaufnahme wahrheitsgemäße Angaben. Versuchen Sie keine unbefugten Zugriffe, übermitteln Sie keine schädlichen Dateien, täuschen Sie keine fremde Identität vor und beeinträchtigen Sie den Betrieb nicht. Der Zugang zur Administration bleibt autorisierten Personen vorbehalten." :
+             currentLang === "pt" ? "Utilize este site de forma lícita e preencha dados verdadeiros ao entrar em contato. Não tente acessos não autorizados, envio de arquivos maliciosos, personificação de terceiros ou interferência no serviço. O acesso administrativo é restrito a pessoal autorizado." :
+             "Utiliza este sitio lícitamente y proporciona información veraz al contactarnos. No intentes acceder sin autorización, enviar archivos maliciosos, suplantar a otra persona ni interferir con el servicio. El acceso a la administración está restringido a personal autorizado."}
           </p>
           <h2>
-            {en
-              ? "Contact and applicable framework"
-              : "Contacto y marco aplicable"}
+            {currentLang === "en" ? "Content and intellectual property" :
+             currentLang === "fr" ? "Contenu et propriété intellectuelle" :
+             currentLang === "de" ? "Inhalte und geistiges Eigentum" :
+             currentLang === "pt" ? "Conteúdo e propriedade intelectual" :
+             "Contenido y propiedad intelectual"}
           </h2>
           <p>
-            {owner ||
-              (en ? "[Legal name pending]" : "[Razón social pendiente]")}{" "}
-            · {jurisdictionDisplay}.{" "}
+            {currentLang === "en" ? "Website content is available for reading and sharing through links. Reuse of protected material requires the relevant authorization unless permitted by law. Ownership and licensing of work created for clients will be defined in each project agreement; this page does not assign rights over a future project." :
+             currentLang === "fr" ? "Les contenus du site sont proposés pour la lecture et le partage par liens. La réutilisation d'éléments protégés nécessite une autorisation préalable, sauf exception légale. La propriété et les licences relatives aux prestations réalisées pour les clients sont définies dans chaque contrat ; la présente page ne confère aucun droit sur un projet futur." :
+             currentLang === "de" ? "Die Inhalte der Website stehen zum Lesen und Verlinken zur Verfügung. Jede Weiterverwendung geschützter Materialien bedarf der Zustimmung, soweit nicht gesetzlich gestattet. Eigentums- und Nutzungsrechte an Arbeitsergebnissen für Kunden werden in jedem Einzelvertrag geregelt; diese Seite überträgt keine Rechte an künftigen Projekten." :
+             currentLang === "pt" ? "O conteúdo está disponível para leitura e compartilhamento por meio de links. A reutilização de materiais protegidos depende de autorização prévia, salvo quando admitida por lei. A titularidade e o licenciamento dos trabalhos desenvolvidos para clientes serão estabelecidos em cada contrato; esta página não cede direitos sobre projetos futuros." :
+             "El contenido está disponible para lectura y para compartir mediante enlaces. La reutilización de materiales protegidos requiere la autorización correspondiente salvo que la ley la permita. La titularidad y las licencias de los trabajos creados para clientes se definirán en cada contrato; esta página no asigna derechos sobre un proyecto futuro."}
+          </p>
+          <h2>
+            {currentLang === "en" ? "Availability and external services" :
+             currentLang === "fr" ? "Disponibilité et services externes" :
+             currentLang === "de" ? "Verfügbarkeit und externe Dienste" :
+             currentLang === "pt" ? "Disponibilidade e serviços externos" :
+             "Disponibilidad y servicios externos"}
+          </h2>
+          <p>
+            {currentLang === "en" ? "We work to keep information accurate and the website operational, but interruptions and corrections may occur. External services have their own terms. Nothing on this page excludes rights or liabilities that cannot legally be excluded." :
+             currentLang === "fr" ? "Nous mettons tout en œuvre pour veiller à l'exactitude des informations et au bon fonctionnement du site, mais des interruptions ou corrections peuvent survenir. Les services tiers sont soumis à leurs propres conditions. Aucune mention sur cette page n'exclut les droits ou responsabilités qui ne peuvent être écartés légalement." :
+             currentLang === "de" ? "Wir bemühen uns um zutreffende Informationen und einen stabilen Betrieb der Website, dennoch können Unterbrechungen und Korrekturen auftreten. Externe Dienste unterliegen ihren eigenen Bestimmungen. Keine Bestimmung auf dieser Seite schließt Rechte oder Haftungen aus, die gesetzlich zwingend gelten." :
+             currentLang === "pt" ? "Trabalhamos para manter as informações corretas e o site em operação, mas podem ocorrer interrupções e ajustes. Serviços externos possuem termos próprios. Nada nesta página exclui direitos ou responsabilidades que legalmente não possam ser excluídos." :
+             "Trabajamos para mantener la información correcta y el sitio operativo, pero pueden existir interrupciones y correcciones. Los servicios externos tienen condiciones propias. Nada en esta página excluye derechos o responsabilidades que legalmente no puedan excluirse."}
+          </p>
+          <h2>
+            {currentLang === "en" ? "Contact and applicable framework" :
+             currentLang === "fr" ? "Contact et cadre applicable" :
+             currentLang === "de" ? "Kontakt und anwendbares Recht" :
+             currentLang === "pt" ? "Contato e marco aplicável" :
+             "Contacto y marco aplicable"}
+          </h2>
+          <p>
+            {owner || pendingOwner[currentLang]} · {jurisdictionDisplay}.{" "}
             {email ? (
               <a href={"mailto:" + email}>{email}</a>
-            ) : en ? (
-              "[Contact email pending]"
             ) : (
-              "[Correo de contacto pendiente]"
+              pendingContactEmail[currentLang]
             )}
             .{" "}
-            {en
-              ? "The applicable legal framework and any mandatory consumer protections must be confirmed for the operator’s jurisdiction before publication. Spanish and English versions describe the same website services; any project contract must specify its governing language and terms."
-              : "El marco jurídico aplicable y los derechos imperativos de consumo deben confirmarse según la jurisdicción del operador antes de publicar. Las versiones en español e inglés describen los mismos servicios; cada contrato de proyecto debe especificar su idioma y condiciones aplicables."}
+            {currentLang === "en" ? "The applicable legal framework and any mandatory consumer protections must be confirmed for the operator’s jurisdiction before publication. Spanish, English, French, German, and Portuguese versions describe the same website services; any project contract must specify its governing language and terms." :
+             currentLang === "fr" ? "Le cadre juridique applicable et les règles impératives de protection des consommateurs doivent être confirmés selon la juridiction de l'exploitant avant publication. Les versions en espagnol, anglais, français, allemand et portugais décrivent les mêmes services ; tout contrat de projet doit spécifier sa langue et ses conditions applicables." :
+             currentLang === "de" ? "Der anwendbare Rechtsrahmen und zwingende Verbraucherrechte müssen vor der Veröffentlichung für die Rechtsordnung des Betreibers bestätigt werden. Die spanische, englische, französische, deutsche und portugiesische Fassung beschreiben dieselben Dienste; jeder Projektvertrag muss seine maßgebliche Sprache und Bedingungen festlegen." :
+             currentLang === "pt" ? "O marco jurídico aplicável e os direitos imperativos do consumidor devem ser confirmados conforme a jurisdição do operador antes da publicação. As versões em espanhol, inglês, francês, alemão e português descrevem os mesmos serviços; cada contrato de projeto deve especificar seu idioma e condições aplicáveis." :
+             "El marco jurídico aplicable y los derechos imperativos de consumo deben confirmarse según la jurisdicción del operador antes de publicar. Las versiones en español, inglés, francés, alemán y portugués describen los mismos servicios; cada contrato de proyecto debe especificar su idioma y condiciones aplicables."}
           </p>
         </>
       )}
