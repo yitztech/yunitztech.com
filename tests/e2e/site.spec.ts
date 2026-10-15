@@ -96,19 +96,31 @@ test("Production gateway health, revision, CSP, HSTS and compiled assets", async
   await expect(page.locator("h1")).toBeVisible();
   expect(await page.evaluate(() => document.styleSheets.length)).toBeGreaterThan(0);
 });
-test("Spanish and English SSR, SEO, legal pages, and all seeded articles", async ({
+test("Multilingual SSR, SEO, legal pages, and all seeded articles", async ({
   page,
   request,
 }) => {
   for (const url of [
     "/",
     "/en/",
+    "/fr/",
+    "/de/",
+    "/pt/",
     "/blog",
     "/en/blog",
+    "/fr/blog",
+    "/de/blog",
+    "/pt/blog",
     "/politica-de-privacidad",
     "/condiciones-de-servicio",
     "/en/privacy-policy",
     "/en/terms-of-service",
+    "/fr/politique-de-confidentialite",
+    "/fr/conditions-de-service",
+    "/de/datenschutzerklaerung",
+    "/de/nutzungsbedingungen",
+    "/pt/politica-de-privacidade",
+    "/pt/termos-de-servico",
   ]) {
     const response = await page.goto(url);
     expect(response?.status()).toBe(200);
@@ -118,18 +130,23 @@ test("Spanish and English SSR, SEO, legal pages, and all seeded articles", async
       url.includes("privacy") ||
       url.includes("politica") ||
       url.includes("terms") ||
-      url.includes("condiciones")
+      url.includes("condiciones") ||
+      url.includes("confidentialite") ||
+      url.includes("datenschutzerklaerung") ||
+      url.includes("nutzungsbedingungen") ||
+      url.includes("privacidade") ||
+      url.includes("servico")
     ) {
       const prose = await page.locator("article.prose").innerText();
       expect(prose).not.toMatch(/\.\./);
     }
   }
-  for (const locale of ["es", "en"]) {
+  for (const locale of ["es", "en", "fr", "de", "pt"]) {
     const posts = await (await request.get("/api/posts/" + locale)).json();
     expect(posts.length).toBeGreaterThanOrEqual(5);
     for (const p of posts) {
       const r = await page.goto(
-        (locale === "en" ? "/en" : "") + "/blog/" + p.slug,
+        (locale === "es" ? "" : "/" + locale) + "/blog/" + p.slug,
       );
       expect(r?.status()).toBe(200);
       await expect(page.locator("h1")).toHaveText(p.title);

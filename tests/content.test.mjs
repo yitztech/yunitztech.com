@@ -3,8 +3,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 const seed = JSON.parse(readFileSync("apps/api/src/seed.json", "utf8"));
 test("Five substantive paired translations, unique slugs and valid content", () => {
-  assert.equal(seed.posts.length, 10);
-  for (const locale of ["es", "en"]) {
+  assert.equal(seed.posts.length, 25);
+  for (const locale of ["es", "en", "fr", "de", "pt"]) {
     const posts = seed.posts.filter((p) => p.locale === locale);
     assert.equal(new Set(posts.map((p) => p.slug)).size, 5);
     for (const p of posts) {

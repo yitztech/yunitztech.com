@@ -145,6 +145,74 @@ nav a:hover,
 .language {
   font-weight: 750;
 }
+.language-picker {
+  position: relative;
+  display: inline-block;
+}
+.language-picker summary.language {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  list-style: none;
+  font-weight: 750;
+  user-select: none;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+.language-picker summary::-webkit-details-marker {
+  display: none;
+}
+.language-picker summary.language:hover,
+.language-picker summary.language:focus-visible {
+  color: var(--blue);
+}
+.lang-arrow {
+  font-size: 0.65rem;
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+.language-picker[open] .lang-arrow {
+  transform: rotate(180deg);
+}
+.language-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  box-shadow: 0 8px 24px rgba(23, 35, 62, 0.12);
+  padding: 6px 0;
+  min-width: 140px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+.language-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.language-option:hover,
+.language-option:focus-visible {
+  background: var(--pale);
+  color: var(--blue);
+}
+.language-option.active {
+  color: var(--blue);
+  font-weight: 750;
+}
+.language-option .lang-code {
+  font-weight: 750;
+  font-size: 0.75rem;
+  min-width: 20px;
+}
 .button {
   display: inline-flex;
   align-items: center;

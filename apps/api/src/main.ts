@@ -50,7 +50,7 @@ function isAllowedOrigin(clientOrigin?: string): boolean {
 }
 const uploads = process.env.UPLOAD_DIR || "./uploads";
 const digest = (s: string) => createHash("sha256").update(s).digest("hex");
-const locale = z.enum(["es", "en"]);
+const locale = z.enum(["es", "en", "fr", "de", "pt"]);
 const imagePath = z
   .string()
   .regex(
@@ -188,7 +188,7 @@ class ApiController {
         path: z
           .string()
           .max(200)
-          .regex(/^\/(?:en\/)?(?:blog(?:\/[a-z0-9-]+)?\/?)?$/),
+          .regex(/^\/(?:(?:en|fr|de|pt)\/)?(?:blog(?:\/[a-z0-9-]+)?\/?)?$/),
         referrer: z.string().max(2048),
       })
       .parse(req.body);
@@ -414,6 +414,17 @@ async function bootstrap() {
   await mkdir(uploads, { recursive: true });
   dummyHash = await argon2.hash(randomBytes(32));
   await db.query(await readFile(join(__dirname, "../src/schema.sql"), "utf8"));
+  await db.query(`
+    DO $$
+    BEGIN
+      ALTER TABLE posts DROP CONSTRAINT IF EXISTS posts_locale_check;
+      ALTER TABLE posts ADD CONSTRAINT posts_locale_check CHECK (locale IN ('es','en','fr','de','pt'));
+      ALTER TABLE settings DROP CONSTRAINT IF EXISTS settings_locale_check;
+      ALTER TABLE settings ADD CONSTRAINT settings_locale_check CHECK (locale IN ('es','en','fr','de','pt'));
+    EXCEPTION WHEN OTHERS THEN
+      NULL;
+    END $$;
+  `);
   const seed = JSON.parse(
     await readFile(join(__dirname, "../src/seed.json"), "utf8"),
   );

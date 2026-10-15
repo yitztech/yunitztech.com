@@ -9,5 +9,9 @@ export async function api(path: string) {
   if (!response.ok) throw new Error(`API ${response.status}`);
   return response.json();
 }
-export const route = (lang: string, path = "") =>
-  `${lang === "en" ? "/en" : "/"}${lang === "en" && path ? "/" : ""}${path}`;
+export const route = (lang: string, path = "") => {
+  const prefix = lang === "es" ? "" : `/${lang}`;
+  if (!path) return prefix || "/";
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  return `${prefix}${cleanPath}`;
+};

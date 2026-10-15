@@ -2,23 +2,161 @@
 import "@fontsource-variable/manrope";
 import "../styles/global.css";
 import { siteUrl } from "../lib/api";
+
+interface Props {
+  lang?: string;
+  title?: string;
+  description?: string;
+  alternate?: string;
+  alternates?: Record<string, string>;
+  noindex?: boolean;
+  image?: string;
+  article?: boolean;
+}
+
+const supportedLocales = ["es", "en", "fr", "de", "pt"] as const;
+type Locale = (typeof supportedLocales)[number];
+
 const {
   lang = "es",
   title = "YunitzTech",
   description = "",
   alternate = "/",
+  alternates,
   noindex = false,
   image = "/images/business-collaboration.webp",
   article = false,
 } = Astro.props;
-const en = lang === "en";
-const home = en ? "/en/" : "/";
-const canonical = new URL(Astro.url.pathname.replace(/\/$/, "") || "/", siteUrl)
-  .href;
+
+const currentLang = (supportedLocales.includes(lang as any) ? lang : "es") as Locale;
+const home = currentLang === "es" ? "/" : `/${currentLang}/`;
+const canonical = new URL(Astro.url.pathname.replace(/\/$/, "") || "/", siteUrl).href;
+
+const defaultAlternates: Record<Locale, string> = {
+  es: "/",
+  en: "/en/",
+  fr: "/fr/",
+  de: "/de/",
+  pt: "/pt/",
+};
+
+const resolvedAlternates: Record<Locale, string> = {
+  ...defaultAlternates,
+  ...(alternates || {}),
+};
+
+if (!alternates && alternate) {
+  if (currentLang === "en") resolvedAlternates.es = alternate;
+  else resolvedAlternates.en = alternate;
+}
+
+const ogLocales: Record<Locale, string> = {
+  es: "es_MX",
+  en: "en_US",
+  fr: "fr_FR",
+  de: "de_DE",
+  pt: "pt_PT",
+};
+
+const langNames: Record<Locale, string> = {
+  es: "Español",
+  en: "English",
+  fr: "Français",
+  de: "Deutsch",
+  pt: "Português",
+};
+
+const langAriaLabels: Record<Locale, string> = {
+  es: "Cambiar idioma",
+  en: "Change language",
+  fr: "Changer de langue",
+  de: "Sprache ändern",
+  pt: "Mudar idioma",
+};
+
+const skipTexts: Record<Locale, string> = {
+  es: "Saltar al contenido",
+  en: "Skip to content",
+  fr: "Passer au contenu",
+  de: "Zum Inhalt springen",
+  pt: "Pular para o conteúdo",
+};
+
+const brandAria: Record<Locale, string> = {
+  es: "YunitzTech inicio",
+  en: "YunitzTech home",
+  fr: "YunitzTech accueil",
+  de: "YunitzTech Startseite",
+  pt: "YunitzTech início",
+};
+
+const navAria: Record<Locale, string> = {
+  es: "Navegación principal",
+  en: "Main navigation",
+  fr: "Navigation principale",
+  de: "Hauptnavigation",
+  pt: "Navegação principal",
+};
+
+const servicesNav: Record<Locale, string> = {
+  es: "Servicios",
+  en: "Services",
+  fr: "Services",
+  de: "Dienste",
+  pt: "Serviços",
+};
+
+const processNav: Record<Locale, string> = {
+  es: "Cómo trabajamos",
+  en: "Our process",
+  fr: "Notre démarche",
+  de: "Unser Ablauf",
+  pt: "Como trabalhamos",
+};
+
+const ctaNav: Record<Locale, string> = {
+  es: "Hablemos",
+  en: "Let’s talk",
+  fr: "Parlons-en",
+  de: "Kontakt",
+  pt: "Fale conosco",
+};
+
+const taglineTop: Record<Locale, string> = {
+  es: "Pequeños comienzos. Grandes posibilidades.",
+  en: "Small beginnings. Real possibilities.",
+  fr: "Petits débuts. Grandes perspectives.",
+  de: "Kleine Anfänge. Echte Möglichkeiten.",
+  pt: "Pequenos começos. Grandes possibilidades.",
+};
+
+const privacyNav: Record<Locale, { path: string; label: string }> = {
+  es: { path: "/politica-de-privacidad", label: "Política de privacidad" },
+  en: { path: "/en/privacy-policy", label: "Privacy policy" },
+  fr: { path: "/fr/politique-de-confidentialite", label: "Politique de confidentialité" },
+  de: { path: "/de/datenschutzerklaerung", label: "Datenschutzerklärung" },
+  pt: { path: "/pt/politica-de-privacidade", label: "Política de privacidade" },
+};
+
+const termsNav: Record<Locale, { path: string; label: string }> = {
+  es: { path: "/condiciones-de-servicio", label: "Condiciones de servicio" },
+  en: { path: "/en/terms-of-service", label: "Terms of service" },
+  fr: { path: "/fr/conditions-de-service", label: "Conditions de service" },
+  de: { path: "/de/nutzungsbedingungen", label: "Nutzungsbedingungen" },
+  pt: { path: "/pt/termos-de-servico", label: "Termos de serviço" },
+};
+
+const taglineBottom: Record<Locale, string> = {
+  es: "Tecnología con propósito. Hecha para tu negocio.",
+  en: "Built with purpose. Made for your business.",
+  fr: "De la technologie avec du sens. Conçue pour votre entreprise.",
+  de: "Technologie mit Sinn. Für Ihr Unternehmen gemacht.",
+  pt: "Tecnologia com propósito. Feita para o seu negócio.",
+};
 ---
 
 <!doctype html>
-<html lang={lang}>
+<html lang={currentLang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -29,16 +167,17 @@ const canonical = new URL(Astro.url.pathname.replace(/\/$/, "") || "/", siteUrl)
     <link rel="canonical" href={canonical} />
     {!noindex && (
       <>
-        <link rel="alternate" hreflang={lang} href={canonical} />
-        <link
-          rel="alternate"
-          hreflang={en ? "es" : "en"}
-          href={new URL(alternate, siteUrl).href}
-        />
+        {supportedLocales.map((l) => (
+          <link
+            rel="alternate"
+            hreflang={l}
+            href={new URL(resolvedAlternates[l], siteUrl).href}
+          />
+        ))}
         <link
           rel="alternate"
           hreflang="x-default"
-          href={en ? new URL(alternate, siteUrl).href : canonical}
+          href={new URL(resolvedAlternates.es || "/", siteUrl).href}
         />
       </>
     )}
@@ -47,7 +186,7 @@ const canonical = new URL(Astro.url.pathname.replace(/\/$/, "") || "/", siteUrl)
     <meta property="og:description" content={description} />
     <meta property="og:type" content={article ? "article" : "website"} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:locale" content={en ? "en_US" : "es_MX"} />
+    <meta property="og:locale" content={ogLocales[currentLang]} />
     <meta property="og:image" content={new URL(image, siteUrl).href} />
     <meta name="twitter:card" content="summary_large_image" />
     <script
@@ -60,34 +199,47 @@ const canonical = new URL(Astro.url.pathname.replace(/\/$/, "") || "/", siteUrl)
   </head>
   <body>
     <a class="skip" href="#main">
-      {en ? "Skip to content" : "Saltar al contenido"}
+      {skipTexts[currentLang]}
     </a>
     <header class="header">
       <div class="container nav">
-        <a class="brand" href={home} aria-label="YunitzTech inicio">
+        <a class="brand" href={home} aria-label={brandAria[currentLang]}>
           <span class="brand-mark" aria-hidden="true">
             y.
           </span>
           yunitz<span class="brand-light">tech</span>
         </a>
-        <nav aria-label={en ? "Main navigation" : "Navegación principal"}>
-          <a href={home + "#servicios"}>{en ? "Services" : "Servicios"}</a>
-          <a href={home + "#proceso"}>
-            {en ? "Our process" : "Cómo trabajamos"}
-          </a>
+        <nav aria-label={navAria[currentLang]}>
+          <a href={home + "#servicios"}>{servicesNav[currentLang]}</a>
+          <a href={home + "#proceso"}>{processNav[currentLang]}</a>
           <a href={home + "blog"}>Blog</a>
         </nav>
         <div class="nav-actions">
-          <a
-            class="language"
-            href={alternate}
-            lang={en ? "es" : "en"}
-            aria-label={en ? "Cambiar a español" : "Switch to English"}
-          >
-            {en ? "ES" : "EN"} <span aria-hidden="true">↗</span>
-          </a>
+          <details class="language-picker">
+            <summary
+              class="language"
+              aria-label={langAriaLabels[currentLang]}
+            >
+              <span>{currentLang.toUpperCase()}</span>
+              <span aria-hidden="true" class="lang-arrow">▾</span>
+            </summary>
+            <div class="language-dropdown">
+              {supportedLocales.map((l) => (
+                <a
+                  class={`language-option ${l === currentLang ? "active" : ""}`}
+                  href={resolvedAlternates[l]}
+                  lang={l}
+                  hreflang={l}
+                  aria-current={l === currentLang ? "true" : undefined}
+                >
+                  <span class="lang-code">{l.toUpperCase()}</span>
+                  <span class="lang-name">{langNames[l]}</span>
+                </a>
+              ))}
+            </div>
+          </details>
           <a class="button small" href={home + "#contacto"}>
-            {en ? "Let’s talk" : "Hablemos"} <span aria-hidden="true">↗</span>
+            {ctaNav[currentLang]} <span aria-hidden="true">↗</span>
           </a>
         </div>
       </div>
@@ -104,34 +256,26 @@ const canonical = new URL(Astro.url.pathname.replace(/\/$/, "") || "/", siteUrl)
             </span>
             yunitz<span class="brand-light">tech</span>
           </a>
-          <p>
-            {en
-              ? "Small beginnings. Real possibilities."
-              : "Pequeños comienzos. Grandes posibilidades."}
-          </p>
+          <p>{taglineTop[currentLang]}</p>
         </div>
         <div class="footer-links">
           <a href={home + "blog"}>Blog</a>
-          <a href={en ? "/en/privacy-policy" : "/politica-de-privacidad"}>
-            {en ? "Privacy policy" : "Política de privacidad"}
+          <a href={privacyNav[currentLang].path}>
+            {privacyNav[currentLang].label}
           </a>
-          <a href={en ? "/en/terms-of-service" : "/condiciones-de-servicio"}>
-            {en ? "Terms of service" : "Condiciones de servicio"}
+          <a href={termsNav[currentLang].path}>
+            {termsNav[currentLang].label}
           </a>
         </div>
       </div>
       <div class="container footer-bottom">
         <span>© {new Date().getFullYear()} YunitzTech</span>
-        <span>
-          {en
-            ? "Built with purpose. Made for your business."
-            : "Tecnología con propósito. Hecha para tu negocio."}
-        </span>
+        <span>{taglineBottom[currentLang]}</span>
       </div>
     </footer>
     <script>
       if (
-        /^\/(?:en\/)?(?:blog(?:\/[a-z0-9-]+)?\/?)?$/.test(location.pathname) &&
+        /^\/(?:(?:en|fr|de|pt)\/)?(?:blog(?:\/[a-z0-9-]+)?\/?)?$/.test(location.pathname) &&
         navigator.doNotTrack !== "1" &&
         !(navigator as Navigator & { globalPrivacyControl?: boolean })
           .globalPrivacyControl
@@ -146,6 +290,23 @@ const canonical = new URL(Astro.url.pathname.replace(/\/$/, "") || "/", siteUrl)
           keepalive: true,
         }).catch(() => {});
       }
+
+      document.addEventListener("click", (e) => {
+        const pickers = document.querySelectorAll<HTMLDetailsElement>(".language-picker[open]");
+        for (const p of pickers) {
+          if (!p.contains(e.target as Node)) {
+            p.removeAttribute("open");
+          }
+        }
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          const pickers = document.querySelectorAll<HTMLDetailsElement>(".language-picker[open]");
+          for (const p of pickers) {
+            p.removeAttribute("open");
+          }
+        }
+      });
     </script>
   </body>
 </html>

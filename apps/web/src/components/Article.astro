@@ -1,28 +1,102 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { siteUrl } from "../lib/api";
+
+const supportedLocales = ["es", "en", "fr", "de", "pt"] as const;
+type Locale = (typeof supportedLocales)[number];
+
 const { lang = "es", post, unavailable = false } = Astro.props;
-const en = lang === "en";
-const translation = post?.translations.find((t: any) => t.locale !== lang);
+const currentLang = (supportedLocales.includes(lang as any) ? lang : "es") as Locale;
+const prefix = currentLang === "es" ? "" : `/${currentLang}`;
+const home = currentLang === "es" ? "/" : `/${currentLang}/`;
+
+const alternates: Record<Locale, string> = {
+  es: "/blog",
+  en: "/en/blog",
+  fr: "/fr/blog",
+  de: "/de/blog",
+  pt: "/pt/blog",
+};
+
+if (post?.translations) {
+  for (const t of post.translations) {
+    if (t.locale && t.slug) {
+      alternates[t.locale as Locale] = `${t.locale === "es" ? "" : "/" + t.locale}/blog/${t.slug}`;
+    }
+  }
+}
+if (post?.locale && post?.slug) {
+  alternates[post.locale as Locale] = `${post.locale === "es" ? "" : "/" + post.locale}/blog/${post.slug}`;
+}
+
+const translation = post?.translations?.find((t: any) => t.locale !== currentLang);
 const alternate = translation
-  ? `${translation.locale === "en" ? "/en" : ""}/blog/${translation.slug}`
-  : en
-    ? "/blog"
-    : "/en/blog";
+  ? `${translation.locale === "es" ? "" : "/" + translation.locale}/blog/${translation.slug}`
+  : alternates[currentLang === "es" ? "en" : "es"];
+
 const blocks = post?.body.split(/\n\s*\n/) || [];
+
+const dateLocales: Record<Locale, string> = {
+  es: "es-MX",
+  en: "en-US",
+  fr: "fr-FR",
+  de: "de-DE",
+  pt: "pt-PT",
+};
+
+const backToBlogTexts: Record<Locale, string> = {
+  es: "← Volver al blog",
+  en: "← Back to the blog",
+  fr: "← Retour au blog",
+  de: "← Zurück zum Blog",
+  pt: "← Voltar ao blog",
+};
+
+const readyTexts: Record<Locale, string> = {
+  es: "¿Listo para explorar tu idea?",
+  en: "Ready to explore your idea?",
+  fr: "Prêt à explorer votre idée ?",
+  de: "Bereit, Ihre Idee zu erkunden?",
+  pt: "Pronto para explorar sua ideia?",
+};
+
+const tellUsTexts: Record<Locale, string> = {
+  es: "Cuéntanos sobre tu negocio",
+  en: "Tell us about your business",
+  fr: "Parlez-nous de votre entreprise",
+  de: "Erzählen Sie uns von Ihrem Unternehmen",
+  pt: "Conte-nos sobre o seu negócio",
+};
+
+const unavailableTitles: Record<Locale, { wait: string; notFound: string }> = {
+  es: { wait: "Volvemos en un momento", notFound: "Artículo no encontrado" },
+  en: { wait: "We’ll be back shortly", notFound: "Article not found" },
+  fr: { wait: "Nous revenons dans un instant", notFound: "Article non trouvé" },
+  de: { wait: "Wir sind gleich zurück", notFound: "Artikel nicht gefunden" },
+  pt: { wait: "Voltamos em um momento", notFound: "Artigo não encontrado" },
+};
+
+const unavailableDescs: Record<Locale, string> = {
+  es: "Visita nuestro blog para descubrir más ideas.",
+  en: "Browse our blog for more ideas.",
+  fr: "Visitez notre blog pour découvrir d'autres idées.",
+  de: "Besuchen Sie unseren Blog für weitere Ideen.",
+  pt: "Visite nosso blog para conferir mais ideias.",
+};
+
+const pageTitle = post
+  ? post.title + " | YunitzTech"
+  : unavailable
+    ? unavailableTitles[currentLang].wait
+    : unavailableTitles[currentLang].notFound;
 ---
 
 <Layout
-  lang={lang}
-  title={
-    post
-      ? post.title + " | YunitzTech"
-      : en
-        ? "Article unavailable"
-        : "Artículo no disponible"
-  }
+  lang={currentLang}
+  title={pageTitle}
   description={post?.excerpt || ""}
   alternate={alternate}
+  alternates={alternates}
   image={post?.image}
   article={true}
   noindex={!post}
@@ -39,7 +113,7 @@ const blocks = post?.body.split(/\n\s*\n/) || [];
         image: new URL(post.image, siteUrl).href,
         datePublished: post.created_at,
         dateModified: post.updated_at,
-        inLanguage: lang,
+        inLanguage: currentLang,
         author: { "@type": "Organization", name: "YunitzTech" },
         publisher: { "@type": "Organization", name: "YunitzTech" },
         mainEntityOfPage: new URL(Astro.url.pathname, siteUrl).href,
@@ -48,8 +122,8 @@ const blocks = post?.body.split(/\n\s*\n/) || [];
   )}
   <div class="container">
     <article class="prose">
-      <a class="back-link" href={(en ? "/en" : "") + "/blog"}>
-        ← {en ? "Back to the blog" : "Volver al blog"}
+      <a class="back-link" href={prefix + "/blog"}>
+        {backToBlogTexts[currentLang]}
       </a>
       {post ? (
         <>
@@ -59,7 +133,7 @@ const blocks = post?.body.split(/\n\s*\n/) || [];
             YunitzTech ·{" "}
             <time datetime={post.updated_at}>
               {new Date(post.updated_at).toLocaleDateString(
-                en ? "en-US" : "es-MX",
+                dateLocales[currentLang],
                 { year: "numeric", month: "long", day: "numeric" },
               )}
             </time>
@@ -80,32 +154,19 @@ const blocks = post?.body.split(/\n\s*\n/) || [];
             ),
           )}
           <hr />
-          <h2>
-            {en
-              ? "Ready to explore your idea?"
-              : "¿Listo para explorar tu idea?"}
-          </h2>
-          <a href={(en ? "/en/" : "/") + "#contacto"}>
-            {en ? "Tell us about your business" : "Cuéntanos sobre tu negocio"}{" "}
-            ↗
+          <h2>{readyTexts[currentLang]}</h2>
+          <a href={home + "#contacto"}>
+            {tellUsTexts[currentLang]} ↗
           </a>
         </>
       ) : (
         <>
           <h1>
-            {en
-              ? unavailable
-                ? "We’ll be back shortly"
-                : "Article not found"
-              : unavailable
-                ? "Volvemos en un momento"
-                : "Artículo no encontrado"}
+            {unavailable
+              ? unavailableTitles[currentLang].wait
+              : unavailableTitles[currentLang].notFound}
           </h1>
-          <p>
-            {en
-              ? "Browse our blog for more ideas."
-              : "Visita nuestro blog para descubrir más ideas."}
-          </p>
+          <p>{unavailableDescs[currentLang]}</p>
         </>
       )}
     </article>

@@ -61,6 +61,99 @@
           "description": "Connect processes, automate repetitive tasks and build the system your operations need."
         }
       ]
+    },
+    "fr": {
+      "headline": "Votre prochaine grande idée commence par une première version.",
+      "description": "Nous concevons des produits numériques pour petites entreprises aux grandes ambitions. De l'idée au MVP utile, prêt à apprendre de vos premiers clients.",
+      "image": "/images/business-collaboration.webp",
+      "services": [
+        {
+          "title": "Pages de vente",
+          "description": "Transformez une idée en proposition claire avec une page rapide et un formulaire qui lance les échanges."
+        },
+        {
+          "title": "Boutiques en ligne",
+          "description": "Commencez à vendre avec un catalogue ciblé, une gestion fluide des commandes et une expérience client soignée."
+        },
+        {
+          "title": "Systèmes de réservation",
+          "description": "Organisez vos rendez-vous, disponibilités et confirmations pour vous concentrer sur votre activité."
+        },
+        {
+          "title": "Applications mobiles et bureau",
+          "description": "Rapprochez vos services du quotidien de vos clients ou simplifiez le travail de votre équipe."
+        },
+        {
+          "title": "Listes de diffusion",
+          "description": "Bâtissez votre propre audience avec des inscriptions volontaires, de la segmentation et un désabonnement simple."
+        },
+        {
+          "title": "Outils métier sur mesure",
+          "description": "Reliez vos processus, automatisez les tâches répétitives et créez l'outil adapté à vos opérations."
+        }
+      ]
+    },
+    "de": {
+      "headline": "Ihre nächste große Idee beginnt mit einer ersten Version.",
+      "description": "Wir entwickeln digitale Produkte für kleine Unternehmen mit großen Plänen. Von der Idee zum nutzbaren MVP, bereit zum Lernen von ersten Kunden.",
+      "image": "/images/business-collaboration.webp",
+      "services": [
+        {
+          "title": "Landingpages",
+          "description": "Verwandeln Sie eine Idee in ein klares Angebot mit einer schnellen Seite und einem Kontaktformular."
+        },
+        {
+          "title": "Onlineshops",
+          "description": "Starten Sie den Verkauf mit einem fokussierten Katalog, klaren Bestellabläufen und bester Kundenerfahrung."
+        },
+        {
+          "title": "Buchungssysteme",
+          "description": "Verwalten Sie Termine, Verfügbarkeiten und Bestätigungen, damit Sie sich auf Ihr Geschäft konzentrieren können."
+        },
+        {
+          "title": "Mobile und Desktop-Apps",
+          "description": "Bringen Sie Ihren Service in den Alltag Ihrer Kunden oder vereinfachen Sie die Arbeitsweise Ihres Teams."
+        },
+        {
+          "title": "E-Mail-Verteiler",
+          "description": "Bauen Sie eine eigene Zielgruppe auf mit freiwilligen Anmeldungen, Segmentierung und einfacher Abmeldung."
+        },
+        {
+          "title": "Individuelle Geschäftstools",
+          "description": "Verbinden Sie Prozesse, automatisieren Sie Routineaufgaben und schaffen Sie das System für Ihre Abläufe."
+        }
+      ]
+    },
+    "pt": {
+      "headline": "Sua próxima grande ideia começa com uma primeira versão.",
+      "description": "Criamos produtos digitais para pequenas empresas com grandes planos. Da ideia a um MVP útil, pronto para aprender com seus primeiros clientes.",
+      "image": "/images/business-collaboration.webp",
+      "services": [
+        {
+          "title": "Landing pages",
+          "description": "Transforme uma ideia em uma proposta clara, com uma página rápida e um formulário que inicia conversas."
+        },
+        {
+          "title": "Lojas virtuais",
+          "description": "Comece a vender com um catálogo focado, gestão de pedidos e uma experiência de compra pensada no cliente."
+        },
+        {
+          "title": "Sistemas de agendamento",
+          "description": "Organize consultas, disponibilidade e confirmações para dedicar mais tempo ao seu próprio negócio."
+        },
+        {
+          "title": "Aplicativos móveis e desktop",
+          "description": "Aproxime seu serviço da rotina dos clientes ou simplifique a forma de trabalho da sua equipe."
+        },
+        {
+          "title": "Listas de e-mail",
+          "description": "Construa uma audiência própria com cadastros voluntários, segmentação e descadastramento descomplicado."
+        },
+        {
+          "title": "Ferramentas sob medida",
+          "description": "Conecte processos, automatize tarefas rotineiras e crie o sistema de que sua operação necessita."
+        }
+      ]
     }
   },
   "posts": [
@@ -163,6 +256,156 @@
       "body": "Every product conversation generates ideas. The problem is not having many ideas but treating them as equally urgent requirements. For a small business, an MVP needs a scope its budget and operations can sustain.\n\nDescribe the outcome before the features\n\nReplace “we want an app” with a concrete task: “we want someone to request a quote so the team can respond with the right information.” That statement makes it easier to evaluate whether each feature supports the main journey.\n\nMap the steps from discovering the offer to receiving a response. Mark genuine uncertainties. The biggest risk may not be technical: people might not understand the service, or preparing a quote might take too long.\n\nUse shared criteria\n\nSeparate what is indispensable to complete the task, what protects people and what improves an experience you have not validated yet. An accessible form and access control for the dashboard are essential. A badge system probably is not.\n\nRecord the reason for each decision and the assumption you want to test. Estimate ongoing work too: answering requests, updating content and maintaining integrations. A feature’s cost does not end at publication.\n\nAgree on the next decision\n\nDecide how you will review results and who makes the call. You do not need complex metrics: useful requests, completed tasks and reported problems can guide early discussions. Add short interviews to understand the numbers.\n\nA postponed feature is not rejected forever. It is waiting for evidence. Keep a separate list of future ideas and protect the scope of the first release. You can then learn sooner and explain the next investment clearly.",
       "image": "/images/mvp-roadmap.webp",
       "image_alt": "Two people prioritize tasks using sticky notes"
+    },
+    {
+      "key": "start-small",
+      "locale": "fr",
+      "slug": "pourquoi-votre-entreprise-a-besoin-d-un-mvp",
+      "title": "Pourquoi votre entreprise a besoin d'un MVP avant de tout construire",
+      "excerpt": "Une première version utile vous aide à tester une idée auprès de vrais clients et à décider où investir ensuite.",
+      "body": "Toute idée d'entreprise repose sur des hypothèses : qui a réellement besoin de la solution, quelle est l'importance du problème et ce que les gens sont prêts à faire pour le résoudre. Un produit minimum viable, ou MVP, transforme certaines de ces suppositions en questions concrètes que vous pouvez vérifier auprès de personnes réelles.\n\nCommencez par une tâche complète\n\nUn MVP n'est pas une application inachevée qui tente de tout faire. C'est une première version fonctionnelle qui permet d'accomplir une tâche utile de bout en bout. Pour une activité de cours particuliers, cela peut signifier consulter les disponibilités et demander un cours. Les dossiers d'évaluation, les points de fidélité et les recommandations automatiques peuvent attendre.\n\nFormulez une hypothèse avant le développement : « Les personnes recherchant des cours pourront choisir un créneau et réserver une séance sans nous téléphoner ». Définissez ce que vous observerez : demandes finalisées, questions fréquentes et temps nécessaire à l'équipe pour répondre. Ne confondez pas simples visites du site et réel intérêt commercial.\n\nRéduisez le périmètre, maintenez l'exigence\n\nLa confidentialité, l'accessibilité, la sécurité et une description transparente du service font partie intégrante de la première version. Réduire les fonctionnalités ne doit en aucun cas justifier la perte de demandes, l'exposition de données personnelles ou l'incertitude du client après l'envoi d'un formulaire.\n\nCertaines étapes peuvent rester manuelles au début. Confirmer personnellement une réservation peut vous apporter plus d'enseignements que d'automatiser un processus encore mal appréhendé. Expliquez clairement au client comment et quand il recevra sa confirmation.\n\nChoisissez vos prochains apprentissages\n\nAnalysez les observations lors de cycles courts. Si personne ne réserve de cours, examinez la proposition, le public cible et le formulaire avant d'ajouter de nouvelles fonctions. Si les demandes n'aboutissent pas, échangez avec ces personnes pour vérifier les créneaux ou les conditions.\n\nUn MVP ne garantit pas les ventes et n'élimine pas tous les risques. Il vous permet d'investir avec des questions plus précises et des preuves tangibles plutôt qu'une liste de fonctionnalités imaginées. Commencez par décrire un client, un problème et une seule action que votre première version doit simplifier.",
+      "image": "/images/mvp-validation.webp",
+      "image_alt": "Deux personnes examinent une idée de produit sur un ordinateur portable"
+    },
+    {
+      "key": "start-small",
+      "locale": "de",
+      "slug": "warum-ihr-unternehmen-ein-mvp-braucht",
+      "title": "Warum Ihr Unternehmen ein MVP braucht, bevor Sie alles bauen",
+      "excerpt": "Eine nützliche Erstversion hilft Ihnen, eine Idee mit echten Kunden zu testen und fundiert über die nächste Investition zu entscheiden.",
+      "body": "Jede Geschäftsidee basiert auf Annahmen: wer die Lösung benötigt, wie dringlich das Problem ist und was Kunden tun würden, um es zu lösen. Ein Minimum Viable Product, kurz MVP, verwandelt einige dieser Annahmen in konkrete Fragen, die Sie mit echten Menschen überprüfen können.\n\nMit einer vollständigen Aufgabe beginnen\n\nEin MVP ist keine unfertige Anwendung, die versucht, alles auf einmal abzudecken. Es ist eine erste Version, die es ermöglicht, eine sinnvolle Aufgabe von Anfang bis Ende zu lösen. Für ein Nachhilfeunternehmen könnte das bedeuten, Verfügbarkeiten zu prüfen und eine Probestunde anzufragen. Leistungsübersichten, Treuepunkte und automatische Empfehlungen können warten.\n\nFormulieren Sie vor der Entwicklung eine Hypothese: „Personen, die Nachhilfe suchen, können einen passenden Termin wählen und eine Stunde anfragen, ohne uns anrufen zu müssen.“ Legen Sie fest, was Sie beobachten wollen: abgeschlossene Anfragen, häufige Fragen und die Zeit, die Ihr Team zur Beantwortung benötigt. Verwechseln Sie Seitenaufrufe nicht mit echtem Kaufinteresse.\n\nUmfang reduzieren, Sorgfalt bewahren\n\nDatenschutz, Barrierefreiheit, Sicherheit und eine ehrliche Beschreibung der Dienstleistung gehören unabdingbar zur ersten Version. Weniger Funktionen dürfen niemals verlorene Anfragen, unsichere Daten oder ratlose Kunden nach dem Absenden eines Formulars bedeuten.\n\nManche Abläufe können anfangs manuell bleiben. Eine Buchung persönlich zu bestätigen liefert Ihnen oft mehr Erkenntnisse, als einen Prozess zu automatisieren, den Sie noch nicht vollständig verstehen. Erklären Sie Kunden genau, wie und wann sie eine Rückmeldung erhalten.\n\nGezielt die nächsten Schritte lernen\n\nWerten Sie Beobachtungen in kurzen Zyklen aus. Wenn niemand eine Stunde anfragt, prüfen Sie das Angebot, die Zielgruppe und das Formular, bevor Sie neue Funktionen hinzufügen. Wenn Anfragen nicht zu Buchungen führen, sprechen Sie mit diesen Interessenten und prüfen Sie Verfügbarkeiten oder Bedingungen.\n\nEin MVP garantiert keine Verkäufe und beseitigt nicht jedes Risiko. Aber es hilft Ihnen, Investitionen auf der Grundlage klarer Fragen und echter Belege zu tätigen statt nach einer ausgedachten Wunschliste. Beschreiben Sie zunächst einen Kunden, ein Problem und eine einzige Handlung, die Ihre erste Version erleichtern soll.",
+      "image": "/images/mvp-validation.webp",
+      "image_alt": "Zwei Personen besprechen eine Produktidee an einem Laptop"
+    },
+    {
+      "key": "start-small",
+      "locale": "pt",
+      "slug": "por-que-sua-empresa-precisa-de-um-mvp",
+      "title": "Por que seu negócio precisa de um MVP antes de construir tudo",
+      "excerpt": "Uma primeira versão útil ajuda a testar uma ideia com clientes reais e decidir o que merece o próximo investimento.",
+      "body": "Toda ideia de negócio contém suposições: quem precisa da solução, qual a relevância do problema e o que as pessoas estão dispostas a fazer para resolvê-lo. Um produto mínimo viável, ou MVP, transforma algumas dessas hipóteses em perguntas concretas que você pode validar com pessoas reais.\n\nComece por uma tarefa concreta\n\nO MVP não é uma aplicação incompleta tentando fazer tudo de uma vez. É uma primeira versão funcional que resolve uma tarefa útil do início ao fim. Para um negócio de aulas particulares, isso pode significar consultar horários e solicitar uma aula. Histórico acadêmico, pontos de fidelidade e recomendações automáticas podem esperar.\n\nEscreva uma hipótese antes de desenvolver: “Pessoas em busca de aulas conseguirão escolher um horário e solicitar uma sessão sem precisar nos ligar”. Defina o que você vai observar: solicitações concluídas, dúvidas frequentes e o tempo que a equipe leva para responder. Evite confundir visualizações de página com interesse comercial genuíno.\n\nReduza o escopo, mantenha o cuidado essencial\n\nPrivacidade, acessibilidade, segurança e uma explicação honesta do serviço fazem parte da primeira versão. Reduzir recursos não justifica perder mensagens, expor dados pessoais ou deixar o cliente sem saber o que aconteceu após enviar o formulário.\n\nAlgumas etapas podem ser manuais no início. Confirmar um agendamento pessoalmente pode trazer mais aprendizados do que automatizar um processo que você ainda não compreende por completo. Explique ao cliente como e quando a confirmação será enviada.\n\nDecida o que aprender em seguida\n\nAnalise as observações em ciclos curtos. Se ninguém solicitar uma aula, investigue a proposta, o público e o formulário antes de adicionar mais funções. Se houver pedidos que não se concretizam, converse com essas pessoas e revise horários ou condições.\n\nUm MVP não garante vendas nem elimina todo o risco. Ele permite investir com perguntas mais claras e evidências melhores do que uma lista imaginada de recursos. Seu próximo passo: descreva um cliente, um problema e uma única ação que sua primeira versão deve facilitar.",
+      "image": "/images/mvp-validation.webp",
+      "image_alt": "Duas pessoas revisam uma ideia de produto em um laptop"
+    },
+    {
+      "key": "landing-validation",
+      "locale": "fr",
+      "slug": "valider-une-idee-avec-une-landing-page",
+      "title": "Une landing page peut être votre premier MVP",
+      "excerpt": "Avant de développer une application, vérifiez si votre offre suscite l'intérêt et quelles questions posent vos clients.",
+      "body": "Toutes les entreprises n'ont pas besoin de commencer par développer une application complète. Si votre principale incertitude est de savoir si quelqu'un a besoin de votre service, une landing page bien conçue peut vous aider à formuler votre proposition et à engager la conversation avec des prospects.\n\nUne proposition compréhensible par tous\n\nExpliquez clairement à qui s'adresse le service, quel problème précis il résout et ce qui se passera lorsqu'un visiteur prendra contact. Évitez les promesses impossibles à tenir à ce stade. Si le produit est encore en cours d'élaboration, dites-le en toute franchise. Ne présentez pas une liste d'attente comme s'il s'agissait d'un achat immédiatement disponible.\n\nImaginez un atelier qui envisage d'offrir des services de maintenance à domicile. Sa première page pourrait présenter les secteurs réellement couverts, les types d'interventions et la façon de demander une évaluation. Elle n'a besoin ni de comptes utilisateurs ni d'une carte en temps réel pour savoir si la demande existe.\n\nUne action principale bien définie\n\nOptez pour un appel à l'action en phase avec votre niveau d'avancement : demander des informations, solliciter une démonstration ou s'inscrire pour recevoir des actualités. Ne demandez que les données strictement indispensables. Chaque champ supplémentaire augmente l'effort requis et engendre une responsabilité de protection.\n\nPrévoyez avec soin l'étape suivante. Une demande laissée sans réponse ne permet pas de valider correctement une offre. Déterminez qui assurera le suivi et comment les questions seront enregistrées, sans promettre un délai intenable pour votre équipe.\n\nMesurer avec du contexte\n\nExaminez les demandes, la provenance des visites et la teneur des échanges. Un faible taux de réponse peut provenir d'un public mal ciblé, d'un message équivoque ou d'une offre peu attractive. Les statistiques brutes ne peuvent à elles seules identifier la véritable cause.\n\nParlez directement avec les personnes qui manifestent de l'intérêt et décelez des récurrences. Vous pourrez ensuite décider d'ajuster le message, de tester un autre canal ou de bâtir l'étape suivante de votre service. La landing page est un instrument d'apprentissage, non une preuve automatique de réussite commerciale.",
+      "image": "/images/landing-design.webp",
+      "image_alt": "Croquis de sites web et notes adhésives lors d'un atelier de conception"
+    },
+    {
+      "key": "landing-validation",
+      "locale": "de",
+      "slug": "geschaeftsidee-mit-landingpage-validieren",
+      "title": "Eine Landingpage kann Ihr erstes MVP sein",
+      "excerpt": "Bevor Sie eine Anwendung entwickeln, prüfen Sie, ob Ihr Angebot auf Interesse stößt und welche Fragen Kunden stellen.",
+      "body": "Nicht jedes Unternehmen muss sofort mit einer komplexen Anwendung starten. Wenn Ihre größte Ungewissheit darin besteht, ob überhaupt Bedarf an Ihrer Dienstleistung besteht, kann eine gezielte Landingpage Ihr Angebot präsentieren und erste Gespräche mit potenziellen Kunden eröffnen.\n\nEin Angebot, das sofort verstanden wird\n\nErklären Sie verständlich, für wen der Service gedacht ist, welches Problem er löst und was passiert, nachdem jemand Kontakt aufnimmt. Vermeiden Sie Versprechungen, die Sie derzeit nicht einlösen können. Wenn sich das Produkt noch im Aufbau befindet, kommunizieren Sie das transparent. Stellen Sie eine Warteliste nicht als sofortige Kaufmöglichkeit dar.\n\nDenken Sie an eine Werkstatt, die Wartung vor Ort anbieten möchte. Eine erste Seite könnte die Einsatzgebiete, die Art der Reparaturen und die Anfrage für einen Kostenvoranschlag erläutern. Es braucht weder Benutzerkonten noch eine interaktive Karte, um festzustellen, ob Interesse vorhanden ist.\n\nEine klare Hauptaktion wählen\n\nEntscheiden Sie sich für einen Aufruf zum Handeln, der zu Ihrer aktuellen Phase passt: Informationen anfordern, eine Demonstration vereinbaren oder sich für Neuigkeiten eintragen. Fragen Sie nur die Daten ab, die Sie wirklich benötigen. Jedes zusätzliche Feld erfordert Aufwand und begründet eine Verantwortung für den Datenschutz.\n\nPlanen Sie auch den nächsten Schritt sorgfältig. Eine unbeantwortete Anfrage ist ein schlechter Weg, ein Angebot zu testen. Legen Sie fest, wer antwortet und wie Rückfragen erfasst werden, ohne unrealistische Reaktionszeiten zu versprechen.\n\nMit Kontext und Augenmaß messen\n\nBetrachten Sie Anfragen, Besucherquellen und Gespräche. Eine geringe Resonanz kann an der falschen Zielgruppe, unklarer Formulierung oder einem unattraktiven Angebot liegen. Reine Zahlen verraten Ihnen nicht automatisch den Grund.\n\nSprechen Sie mit Interessierten und suchen Sie nach Mustern. Entscheiden Sie dann, ob Sie Ihre Botschaft verfeinern, einen anderen Kanal testen oder den nächsten Prozessschritt umsetzen. Eine Landingpage ist ein Werkzeug zum Lernen, kein automatischer Beweis für den Gesamterfolg des Geschäfts.",
+      "image": "/images/landing-design.webp",
+      "image_alt": "Webseitenskizzen und Haftnotizen während eines Design-Workshops"
+    },
+    {
+      "key": "landing-validation",
+      "locale": "pt",
+      "slug": "validar-uma-ideia-com-landing-page",
+      "title": "Uma landing page pode ser o seu primeiro MVP",
+      "excerpt": "Antes de criar um aplicativo, descubra se sua proposta desperta interesse e quais perguntas os clientes fazem.",
+      "body": "Nem todo negócio precisa começar com um aplicativo robusto. Se a sua principal incerteza é saber se alguém realmente precisa do seu serviço, uma landing page focada pode apresentar a proposta e abrir canais de diálogo com clientes em potencial.\n\nUma proposta compreensível para o público\n\nExplique com clareza para quem é o serviço, qual problema ele resolve e o que acontece após o primeiro contato. Evite fazer promessas que sua operação ainda não consegue cumprir. Se o produto estiver em desenvolvimento, seja transparente. Não anuncie uma lista de espera como se fosse uma compra disponível imediatamente.\n\nPense em uma oficina que deseja oferecer manutenção a domicílio. Sua primeira página pode explicar as regiões atendidas, os tipos de serviço e como solicitar uma avaliação. Não são necessárias contas de usuário nem mapas em tempo real para descobrir se há demanda de verdade.\n\nUma chamada para ação principal\n\nEscolha uma ação alinhada ao seu momento: pedir mais informações, agendar uma demonstração ou cadastrar-se voluntariamente para receber novidades. Solicite apenas os dados indispensáveis. Cada campo a mais gera esforço para o usuário e responsabilidade sobre os dados.\n\nPrepare também a etapa seguinte. Uma mensagem não respondida não valida uma proposta comercial. Defina quem vai retornar os contatos e como as dúvidas serão registradas, sem prometer prazos que a equipe não conseguirá sustentar.\n\nAvalie os resultados com contexto\n\nObserve pedidos de contato, origens de tráfego e conversas geradas. Um número baixo de respostas pode decorrer de um público inadequado, mensagem confusa ou proposta pouco atraente. Estatísticas isoladas não revelam a causa exata do comportamento.\n\nConverse com quem demonstrou interesse e identifique padrões. Depois decida se vale ajustar a mensagem, experimentar outro canal de divulgação ou estruturar a próxima etapa do serviço. A landing page é um recurso para aprender, não uma garantia automática do negócio.",
+      "image": "/images/landing-design.webp",
+      "image_alt": "Esboços de páginas web e notas adesivas durante uma oficina de design"
+    },
+    {
+      "key": "commerce",
+      "locale": "fr",
+      "slug": "premiere-boutique-en-ligne",
+      "title": "Votre première boutique en ligne : vendez l'essentiel, apprenez le reste",
+      "excerpt": "Un catalogue ciblé et un parcours d'achat clair vous en apprendront bien plus qu'une boutique pleine d'options non validées.",
+      "body": "Lancer une boutique en ligne implique bien plus que simplement afficher des produits sur un écran. Vous devez pouvoir vérifier vos stocks, expliquer les conditions de livraison, répondre aux interrogations et gérer les éventuels imprévus. Votre premier MVP doit tester ce parcours complet avec un catalogue que vous maîtrisez parfaitement.\n\nChoisir un catalogue gérable\n\nDémarrez avec des articles qui illustrent parfaitement votre proposition et dont vous maîtrisez la disponibilité. Publiez des photographies soignées, des descriptifs précis et des conditions transparentes. Vous n'avez pas besoin de centaines de références pour détecter des blocages dans l'achat ou dans la logistique.\n\nAvant d'intégrer des passerelles de paiement, déterminez avec précision la devise, la fiscalité applicable, les zones de livraison et la politique de retour avec les conseils juridiques appropriés. Les prestataires de paiement et leurs frais doivent être soigneusement évalués pour votre marché cible.\n\nTester la commande de bout en bout\n\nRéalisez vous-même des commandes tests, examinez les e-mails reçus par le client et vérifiez que votre équipe est en mesure de préparer le colis sans accroc. Anticipez les rejets de paiement, les ruptures de stock inattendues et les demandes d'annulation. Une page de confirmation réussie ne sert à rien si la commande se perd en coulisses.\n\nFaites appel à des solutions de paiement réputées et évitez impérativement de stocker des coordonnées bancaires sur vos serveurs. Restreignez l'accès au panneau d'administration uniquement aux collaborateurs qui en ont besoin.\n\nTirer les leçons des opérations\n\nObservez attentivement les étapes où les acheteurs abandonnent leur panier et notez les questions récurrentes. Une incertitude concernant les frais de port est souvent plus urgente à traiter qu'un programme de points de fidélité. Les retours de produits et les délais d'expédition sont aussi des indicateurs précieux.\n\nVos prochains investissements doivent répondre à des freins constatés : de meilleurs filtres si le catalogue s'étoffe, de l'automatisation si le volume le justifie ou des explications plus détaillées si des doutes subsistent. L'objectif initial est d'établir que vous savez vendre et livrer de manière constante.",
+      "image": "/images/online-store.webp",
+      "image_alt": "Une personne gère des ventes et paiements depuis une application mobile"
+    },
+    {
+      "key": "commerce",
+      "locale": "de",
+      "slug": "der-erste-onlineshop",
+      "title": "Ihr erster Onlineshop: Das Wesentliche verkaufen, Wichtiges lernen",
+      "excerpt": "Ein fokussierter Katalog und ein klarer Kaufprozess lehren Sie mehr als ein Shop voller ungetesteter Funktionen.",
+      "body": "Der Start eines Onlineshops bedeutet weit mehr, als bloß Produktfotos ins Netz zu stellen. Sie müssen Lagerbestände überwachen, Lieferzeiten transparent erklären, Rückfragen beantworten und Reklamationen souverän handhaben. Ihr erstes MVP sollte diesen gesamten Ablauf anhand eines überschaubaren Sortiments erproben.\n\nEin überschaubares Sortiment wählen\n\nBeginnen Sie mit ausgewählten Produkten, die Ihr Angebot treffend repräsentieren und deren Verfügbarkeit gesichert ist. Verwenden Sie aussagekräftige Fotos, hilfreiche Beschreibungen und faire Bedingungen. Sie benötigen kein Riesensortiment, um Schwachstellen im Bestell- oder Lieferprozess aufzudecken.\n\nBevor Sie Zahlungssysteme anbinden, klären Sie Währung, Mehrwertsteuer, Versandgebiete und Widerrufsbelehrungen mit fachkundiger Beratung. Zahlungsdienstleister und deren Gebühren müssen für Ihren Zielmarkt sorgfältig geprüft werden, da Verfügbarkeiten variieren.\n\nDen gesamten Bestellprozess durchspielen\n\nFühren Sie Testbestellungen durch, prüfen Sie alle Kundenbenachrichtigungen und stellen Sie sicher, dass Ihr Team Bestellungen reibungslos bearbeiten kann. Berücksichtigen Sie fehlgeschlagene Zahlungen, Lieferengpässe und Stornierungen. Eine Erfolgsmeldung im Browser nützt wenig, wenn die Bestellung im Betriebsalltag untergeht.\n\nNutzen Sie bewährte Zahlungsanbieter und speichern Sie keinesfalls Kreditkartendaten auf eigenen Servern. Vergeben Sie Zugriffsrechte im Administrationsbereich nur an Personen, die diese zwingend benötigen.\n\nAus dem täglichen Ablauf lernen\n\nAnalysieren Sie, an welcher Stelle Bestellungen abgebrochen werden und welche Fragen wiederholt auftreten. Unklarheiten bei den Versandkosten sind oft dringlicher als ein Bonuspunkteprogramm. Auch Retourenquoten und Bearbeitungszeiten geben wichtige Hinweise auf Produktqualität und Service.\n\nIhre nächsten Investitionen sollten auf realen Erkenntnissen beruhen: verbesserte Filter bei wachsendem Katalog, Automatisierung bei steigendem Volumen oder transparentere Hinweise bei wiederkehrenden Rückfragen. Das erste Ziel lautet stets: verlässlich verkaufen und pünktlich liefern.",
+      "image": "/images/online-store.webp",
+      "image_alt": "Eine Person verwaltet Verkäufe und Zahlungen über eine mobile App"
+    },
+    {
+      "key": "commerce",
+      "locale": "pt",
+      "slug": "primeira-loja-virtual",
+      "title": "Sua primeira loja online: venda o essencial e aprenda o importante",
+      "excerpt": "Um catálogo enxuto e um processo de compra transparente ensinam mais do que uma loja repleta de recursos não validados.",
+      "body": "Lançar uma loja virtual envolve muito mais do que exibir itens em uma vitrine digital. É indispensável conseguir confirmar estoque, detalhar prazos de entrega, responder a dúvidas e resolver contratempos operacionais. Seu primeiro MVP precisa testar essa jornada inteira com um catálogo fácil de gerenciar.\n\nEscolha um catálogo administrável\n\nInicie com produtos que representem com fidelidade sua proposta de valor e cuja reposição você domine. Utilize fotos autênticas, descrições informativas e condições claras de compra. Não é necessário cadastrar centenas de referências para identificar gargalos no fluxo de pedidos.\n\nAntes de integrar meios de pagamento, defina moedas, tributação cabível, regiões atendidas e políticas de troca com orientação adequada. Avalie as empresas intermediadoras de pagamento e suas taxas para o seu mercado de atuação.\n\nTeste o fluxo de compra de ponta a ponta\n\nFaça um pedido de teste completo, confira as notificações enviadas ao comprador e confirme se a equipe consegue preparar o pacote com agilidade. Considere cenários de pagamentos não autorizados, itens esgotados e cancelamentos. Uma tela de confirmação bonita perde o sentido se o pedido se perder na operação.\n\nTrabalhe com intermediadores de pagamento confiáveis e nunca armazene dados de cartão na sua infraestrutura. Mantenha os acessos ao painel restritos a quem realmente precisa operar a plataforma.\n\nAprenda com o dia a dia da operação\n\nMonitore em que ponto ocorrem os abandonos de carrinho e quais dúvidas se repetem nos canais de suporte. A incerteza sobre o frete muitas vezes é mais urgente do que um clube de vantagens. Prazos de envio e devoluções também trazem pistas valiosas sobre o serviço.\n\nSeus próximos investimentos devem solucionar dores reais: filtros avançados se o catálogo crescer, automação quando o volume aumentar ou informações mais visíveis se houver dúvidas frequentes. O foco primordial é provar que você consegue vender e entregar com regularidade.",
+      "image": "/images/online-store.webp",
+      "image_alt": "Uma pessoa gerencia vendas e pagamentos em um aplicativo móvel"
+    },
+    {
+      "key": "booking",
+      "locale": "fr",
+      "slug": "mvp-systeme-de-reservation",
+      "title": "Des réservations sans chaos : que mettre dans une première version",
+      "excerpt": "Disponibilités, demandes et confirmations : commencez par un parcours simple que votre équipe peut honorer sereinement.",
+      "body": "Lorsqu'une entreprise gère ses rendez-vous à travers de multiples canaux, il est fréquent d'oublier des messages ou d'attribuer le même créneau horaire à deux clients différents. Un MVP de réservation doit éliminer cette confusion et distinguer clairement ce qui est confirmé de ce qui reste en attente.\n\nDéfinir les règles du service\n\nAvant d'agencer un calendrier en ligne, déterminez par écrit la durée de chaque prestation, les plages de travail et le temps d'intervalle nécessaire entre deux rendez-vous. Identifiez également les ressources partagées, comme un équipement spécifique, une salle ou un praticien particulier.\n\nUne demande en ligne ne constitue pas toujours une réservation ferme. Si votre équipe doit au préalable valider les plannings, affichez lisiblement le statut en attente et précisez le mode de confirmation. Évitez qu'un client ne se présente en pensant son rendez-vous déjà validé.\n\nBâtir le parcours minimal\n\nLa première version peut simplement proposer de choisir un service, suggérer une date et recueillir les coordonnées du demandeur. Le tableau de bord interne doit centraliser ces sollicitations et permettre d'y répondre sans délai. Si vous proposez une confirmation instantanée, le système doit bloquer automatiquement les réservations simultanées sur un même horaire.\n\nIntégrez les règles d'annulation et de report dès la conception initiale. Définissez la manière d'avertir le client et de libérer le créneau dans l'agenda. Les automatisations qui négligent les imprévus finissent souvent par surcharger les équipes.\n\nÉvaluer avant d'enrichir l'outil\n\nExaminez le volume de rendez-vous honorés, les annulations et le temps consacré à la coordination. Demandez aux clients comme aux collaborateurs quelles informations manquaient lors de la prise de contact. Les rappels automatisés peuvent s'avérer utiles, mais leur canal, le consentement préalable et leur coût doivent être anticipés.\n\nDémarrez avec un service unique et un seul agenda si cela reflète votre activité présente. Vous ajouterez des sites multiples ou des acomptes en ligne lorsqu'un besoin avéré se présentera. Un système sobre et fiable apporte bien plus qu'un outil complexe que personne ne peut tenir à jour.",
+      "image": "/images/booking-planner.webp",
+      "image_alt": "Agenda ouvert avec planification des dates et des tâches"
+    },
+    {
+      "key": "booking",
+      "locale": "de",
+      "slug": "mvp-buchungssystem",
+      "title": "Buchungen ohne Chaos: Was in eine erste Version gehört",
+      "excerpt": "Verfügbarkeit, Anfragen und Bestätigungen: Beginnen Sie mit einem überschaubaren Ablauf, den Ihr Team verlässlich meistert.",
+      "body": "Wenn ein Unternehmen Termine über verschiedene Kanäle koordiniert, gehen schnell Nachrichten verloren oder zwei Kunden buchen versehentlich denselben Termin. Ein Buchungs-MVP sollte diese Reibungspunkte beseitigen und jederzeit verdeutlichen, welcher Termin bestätigt ist und was noch aussteht.\n\nServiceregeln verbindlich festlegen\n\nBevor Sie eine Benutzeroberfläche gestalten, erfassen Sie die Dauer der Leistungen, die Arbeitszeiten und die Pufferzeiten zwischen Terminen. Berücksichtigen Sie gemeinsame Ressourcen wie Behandlungsräume, Geräte oder Fachkräfte mit Spezialisierung.\n\nEine Anfrage ist nicht automatisch eine feste Buchung. Wenn Ihr Team die Kapazitäten manuell prüfen muss, zeigen Sie den Status „ausstehend“ an und erklären Sie, wie die Bestätigung erfolgt. Verhindern Sie, dass Kunden vor Ort erscheinen, weil sie den Termin bereits als zugesagt wähnten.\n\nDen minimalen Buchungsablauf umsetzen\n\nDie erste Version kann die Auswahl einer Dienstleistung, einen Wunschtermin und Kontaktdaten abfragen. Ein internes Dashboard muss diese Eingänge übersichtlich auflisten und bearbeiten lassen. Bei sofortiger Bestätigung muss das System Überschneidungen zuverlässig ausschließen, selbst wenn zwei Personen zeitgleich buchen.\n\nRegeln für Umbuchungen und Stornierungen gehören von Beginn an dazu. Bestimmen Sie, wie Änderungen kommuniziert werden und wie freigewordene Termine wieder verfügbar werden. Automatisierte Abläufe, die Ausnahmen ignorieren, verursachen im Alltag oft mehr Arbeit als manuelle Absprachen.\n\nErfahrungen sammeln vor dem Ausbau\n\nBeobachten Sie wahrgenommene Termine, Stornoquoten und den tatsächlichen Abstimmungsaufwand. Fragen Sie Kunden und Mitarbeitende, welche Auskünfte gefehlt haben. Automatische Erinnerungen können nützlich sein, erfordern jedoch Planung hinsichtlich Kanal, Einwilligung und Betriebskosten.\n\nStarten Sie mit einem einzelnen Service und einem Kalender, wenn das Ihrem aktuellen Ablauf entspricht. Zusätzliche Standorte, Mitgliedschaften oder Vorauszahlungen sollten erst folgen, wenn ein konkreter Bedarf besteht. Ein schlankes, verlässliches Werkzeug hilft mehr als ein überfrachtetes System.",
+      "image": "/images/booking-planner.webp",
+      "image_alt": "Geplanter Kalender mit Terminen und Notizen"
+    },
+    {
+      "key": "booking",
+      "locale": "pt",
+      "slug": "mvp-sistema-de-agendamento",
+      "title": "Agendamentos sem caos: o que incluir em uma primeira versão",
+      "excerpt": "Disponibilidade, pedidos e confirmações: comece com um fluxo enxuto que sua equipe consiga atender com segurança.",
+      "body": "Quando um negócio recebe pedidos de agendamento por diferentes canais, é fácil esquecer mensagens ou marcar duas pessoas no mesmo horário. Um MVP de agendamentos precisa eliminar esses desencontros e deixar evidente o que está confirmado e o que ainda depende de aprovação.\n\nDefina as regras do atendimento\n\nAntes de montar qualquer calendário na tela, registre a duração de cada serviço, a jornada de atendimento e o intervalo necessário entre um cliente e outro. Leve em conta também recursos compartilhados, como uma sala de atendimento ou um profissional especialista.\n\nUma solicitação não equivale necessariamente a uma reserva fechada. Se a equipe precisa checar a agenda primeiro, mostre o status de pendência e esclareça como se dará o retorno. Evite que o cliente compareça ao local achando que o horário já está garantido.\n\nConstrua a jornada mínima essencial\n\nA primeira versão pode permitir a escolha do serviço, a indicação de uma data pretendida e o preenchimento dos contatos básicos. O painel interno deve listar as solicitações e facilitar as respostas. Caso opte por confirmação automática instantânea, o sistema deve prevenir conflitos de horário simultâneos.\n\nInclua critérios claros para alterações e cancelamentos desde o primeiro dia. Defina a maneira de avisar o cliente e liberar o horário vago na grade. Automações que ignoram situações excepcionais tendem a sobrecarregar a equipe em vez de ajudar.\n\nAvalie os resultados antes de expandir\n\nAcompanhe os atendimentos realizados, os cancelamentos e o tempo dedicado à organização da agenda. Pergunte a clientes e funcionários que informações poderiam ter sido mais claras. Lembretes automáticos podem ser convenientes, mas canal, consentimento e custos pedem planejamento prévio.\n\nComece com um único serviço e uma agenda se isso representar sua operação hoje. Adicione múltiplas unidades, assinaturas ou cobranças antecipadas conforme necessidades reais surgirem. Um sistema simples e confiável é muito mais eficaz do que um calendário complexo que ninguém consegue manter.",
+      "image": "/images/booking-planner.webp",
+      "image_alt": "Agenda aberta com planejamento de datas e tarefas"
+    },
+    {
+      "key": "roadmap",
+      "locale": "fr",
+      "slug": "prioriser-les-fonctionnalites-d-un-mvp",
+      "title": "Comment choisir ce qui entre dans votre MVP et ce qui peut attendre",
+      "excerpt": "Une méthode pratique pour hiérarchiser les idées sans transformer votre première version en projet sans fin.",
+      "body": "Toute discussion autour d'un produit numérique fait émerger une foule d'idées nouvelles. La vraie difficulté ne réside pas dans l'abondance d'idées, mais dans le risque de les considérer toutes comme des priorités absolues. Pour une petite entreprise, un MVP nécessite un périmètre que le budget et les équipes peuvent réellement soutenir.\n\nDéfinir le résultat attendu avant les fonctionnalités\n\nRemplacez l'injonction « nous voulons une application » par un résultat concret : « nous voulons qu'un client puisse demander un devis et que notre équipe puisse répondre avec les bonnes informations ». Cet énoncé limpide permet d'évaluer immédiatement si chaque composant soutient ou non le parcours prioritaire.\n\nDécrivez le cheminement du visiteur, depuis la découverte de l'offre jusqu'à la réponse reçue. Repérez où résident les vraies incertitudes. Bien souvent, le risque principal n'est pas technologique : il se peut que personne ne comprenne le positionnement ou que le calcul d'un tarif prenne trop de temps.\n\nClasser selon des critères partagés\n\nSéparez ce qui est indispensable à l'accomplissement de la mission, ce qui garantit la protection des utilisateurs et ce qui ne fait qu'embellir une expérience encore non validée. Un formulaire accessible et des accès sécurisés au panneau de gestion sont incontournables. Un module de badges ou de récompenses ne l'est absolument pas.\n\nDocumentez le motif de chaque arbitrage et l'hypothèse sous-jacente à tester. Évaluez également la charge d'exploitation dans la durée : traitement des messages entrants, maintenance éditoriale et suivi des intégrations. Le coût d'un développement ne s'arrête pas au jour de sa mise en ligne.\n\nS'accorder sur les étapes suivantes\n\nDéterminez comment les résultats seront analysés et qui tranchera. Des métriques complexes ne sont pas indispensables : le nombre de contacts qualifiés, les démarches menées à terme et les difficultés signalées suffisent à guider les premières évolutions. Complétez ces données chiffrées par de courts entretiens qualitatifs.\n\nUne idée reportée n'est pas définitivement écartée ; elle attend simplement d'être confortée par des observations réelles. Conservez une liste dédiée aux pistes futures et protégez rigoureusement le périmètre de la première livraison. Vous apprendrez plus vite et investirez avec lucidité.",
+      "image": "/images/mvp-roadmap.webp",
+      "image_alt": "Deux personnes hiérarchisent des tâches avec des notes adhésives"
+    },
+    {
+      "key": "roadmap",
+      "locale": "de",
+      "slug": "mvp-funktionen-priorisieren",
+      "title": "Wie Sie entscheiden, was in Ihr MVP gehört und was warten kann",
+      "excerpt": "Ein praktischer Weg, Ideen zu strukturieren, ohne die Erstversion in ein Endlosprojekt zu verwandeln.",
+      "body": "Jedes Gespräch über ein neues Produkt bringt frische Vorschläge hervor. Das Problem ist selten ein Mangel an Ideen, sondern die Neigung, alle Einfälle als gleich dringlich einzustufen. Für kleine Unternehmen braucht ein MVP einen klar umrissenen Umfang, den Budget und Tagesgeschäft dauerhaft tragen können.\n\nDas Ziel vor den Einzelfunktionen definieren\n\nErsetzen Sie den Wunsch „Wir wollen eine App“ durch eine greifbare Aufgabe: „Wir wollen, dass ein Interessent ein Angebot anfordert und unser Team mit den nötigen Details antworten kann.“ Ein solcher Leitsatz erleichtert die Entscheidung, ob eine Funktion wirklich den Kernablauf unterstützt.\n\nSkizzieren Sie die Stationen vom ersten Kontakt bis zur Rückmeldung. Markieren Sie offene Fragen. Oft liegt das größte Risiko nicht in der Technik: Vielleicht versteht niemand das Angebot, oder die Ausarbeitung eines Kostenvoranschlags dauert zu lange.\n\nNach gemeinsamen Kriterien sortieren\n\nTrennen Sie das, was für den Abschluss der Kernaufgabe unverzichtbar ist, von Schutzmaßnahmen für Nutzerdaten und von Elementen, die bloß eine noch ungetestete Erfahrung verschönern würden. Ein barrierefreies Formular und sichere Anmeldedaten für das Backend sind unverzichtbar. Ein Gamification-System ist es in dieser Phase keineswegs.\n\nHalten Sie die Begründung für jede Weichenstellung fest und notieren Sie die Annahme, die Sie überprüfen wollen. Berücksichtigen Sie den laufenden Aufwand: Kundenbetreuung, redaktionelle Pflege und Schnittstellenkontrolle. Die Kosten einer Funktion enden keineswegs mit der Veröffentlichung.\n\nNächste Entscheidungen gemeinsam treffen\n\nLegen Sie fest, wie Resultate ausgewertet werden und wer die Entscheidungen trifft. Sie benötigen keine hochkomplexen Kennzahlen: aussagekräftige Anfragen, abgeschlossene Vorgänge und gemeldete Hürden reichen für fundierte Gespräche. Ergänzen Sie Zahlen durch kurze Gespräche mit echten Nutzern.\n\nEine zurückgestellte Funktion ist nicht für immer verworfen, sie wartet lediglich auf belastbare Erkenntnisse. Führen Sie eine separate Liste für zukünftige Ausbaustufen und schützen Sie den Umfang der ersten Auslieferung. So lernen Sie schneller und begründen jeden weiteren Schritt stichhaltig.",
+      "image": "/images/mvp-roadmap.webp",
+      "image_alt": "Zwei Personen priorisieren Aufgaben mit Haftnotizen"
+    },
+    {
+      "key": "roadmap",
+      "locale": "pt",
+      "slug": "priorizar-recursos-do-mvp",
+      "title": "Como escolher o que entra no seu MVP e o que pode esperar",
+      "excerpt": "Uma maneira prática de organizar ideias sem transformar sua primeira versão em um projeto sem fim.",
+      "body": "Qualquer conversa sobre um novo produto gera uma enxurrada de ideias. O desafio não está na quantidade de propostas, mas em tratá-las como requisitos igualmente urgentes. Para pequenas empresas, um MVP precisa de um escopo enxuto que orçamento e rotina de trabalho consigam sustentar.\n\nDescreva o resultado antes das funcionalidades\n\nSubstitua a frase «queremos um app» por um objetivo concreto: «queremos que uma pessoa solicite um orçamento e que a equipe consiga responder com os dados corretos». Essa definição permite avaliar rapidamente se cada recurso realmente apoia a jornada principal.\n\nMapeie as etapas desde o instante em que o cliente descobre a proposta até receber o retorno. Identifique onde há dúvidas reais. Muitas vezes o maior risco não é de ordem tecnológica: pode ser que ninguém compreenda o serviço ou que calcular um orçamento leve tempo demais.\n\nClassifique com critérios compartilhados\n\nSepare o que é indispensável para concluir a tarefa principal, o que protege a segurança das pessoas e o que apenas incrementa uma experiência ainda não validada. Um formulário acessível e o controle de acesso ao painel são requisitos fundamentais. Um sistema de medalhas e recompensas certamente não é.\n\nRegistre o motivo de cada decisão e a hipótese que você pretende testar. Estime também a dedicação contínua: atendimento a chamados, atualização de textos e acompanhamento de integrações. O custo de uma funcionalidade não termina no dia do lançamento.\n\nAlinhe os próximos passos com clareza\n\nDefina como os resultados serão analisados e quem terá poder de decisão. Não são necessárias métricas complexas: contatos qualificados, tarefas finalizadas e dificuldades relatadas orientam perfeitamente as primeiras conversas. Complemente os números com entrevistas rápidas com usuários.\n\nUm recurso adiado não foi descartado para sempre; está apenas aguardando validação prática. Guarde essas ideias em uma lista separada para o futuro e preserve o escopo da primeira versão. Dessa forma você aprende mais rápido e justifica cada novo investimento com segurança.",
+      "image": "/images/mvp-roadmap.webp",
+      "image_alt": "Duas pessoas priorizam tarefas usando notas adesivas"
     }
   ]
 }
