@@ -11,3 +11,4 @@ uploads/
 
 backups/
 **/.astro/
+tests/bdd/.generated/

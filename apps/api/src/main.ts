@@ -24,8 +24,18 @@ import rateLimit from "@fastify/rate-limit";
 import multipart from "@fastify/multipart";
 import argon2 from "argon2";
 import sharp from "sharp";
-import { z, ZodError } from "zod";
+import { ZodError } from "zod";
 import { db } from "./db";
+import {
+  contactSchema,
+  idSchema,
+  locale,
+  loginSchema,
+  postSchema,
+  settingsSchema,
+  statusSchema,
+  viewSchema,
+} from "./validation";
 sharp.concurrency(1);
 const origin = process.env.SITE_URL || "http://localhost:8080";
 function isAllowedOrigin(clientOrigin?: string): boolean {
@@ -50,49 +60,6 @@ function isAllowedOrigin(clientOrigin?: string): boolean {
 }
 const uploads = process.env.UPLOAD_DIR || "./uploads";
 const digest = (s: string) => createHash("sha256").update(s).digest("hex");
-const locale = z.enum(["es", "en", "fr", "de", "pt"]);
-const imagePath = z
-  .string()
-  .regex(
-    /^\/(images\/[a-zA-Z0-9_-]+\.(webp|avif)|api\/media\/[a-f0-9]{32}\.webp)$/,
-  );
-const postSchema = z
-  .object({
-    translation_key: z
-      .string()
-      .min(1)
-      .max(100)
-      .regex(/^[a-z0-9-]+$/),
-    locale,
-    slug: z
-      .string()
-      .min(1)
-      .max(150)
-      .regex(/^[a-z0-9-]+$/),
-    title: z.string().min(5).max(180),
-    excerpt: z.string().min(20).max(320),
-    body: z.string().min(80).max(60000),
-    image: imagePath,
-    image_alt: z.string().max(200),
-    published: z.boolean(),
-  })
-  .strict();
-const settingsSchema = z
-  .object({
-    headline: z.string().min(10).max(180),
-    description: z.string().min(20).max(400),
-    image: imagePath,
-    services: z
-      .array(
-        z.object({
-          title: z.string().min(2).max(90),
-          description: z.string().min(10).max(250),
-        }),
-      )
-      .min(1)
-      .max(12),
-  })
-  .strict();
 async function auth(req: any, res: any) {
   const token = req.cookies.session;
   if (
@@ -155,19 +122,7 @@ class ApiController {
     return post;
   }
   @Post("contact") async contact(@Req() req: any) {
-    const data = z
-      .object({
-        name: z.string().trim().min(2).max(100),
-        email: z.string().email().max(254),
-        company: z.string().trim().max(150),
-        service: z.string().min(2).max(100),
-        message: z.string().trim().min(20).max(5000),
-        locale,
-        consent: z.literal(true),
-        website: z.string().max(200).optional(),
-      })
-      .strict()
-      .parse(req.body);
+    const data = contactSchema.parse(req.body);
     if (data.website) return { ok: true };
     await db.query(
       "INSERT INTO contacts(name,email,company,service,message,locale) VALUES($1,$2,$3,$4,$5,$6)",
@@ -183,15 +138,7 @@ class ApiController {
     return { ok: true };
   }
   @Post("view") async view(@Req() req: any) {
-    const d = z
-      .object({
-        path: z
-          .string()
-          .max(200)
-          .regex(/^\/(?:(?:en|fr|de|pt)\/)?(?:blog(?:\/[a-z0-9-]+)?\/?)?$/),
-        referrer: z.string().max(2048),
-      })
-      .parse(req.body);
+    const d = viewSchema.parse(req.body);
     let host = "direct";
     try {
       host = new URL(d.referrer).hostname;
@@ -212,16 +159,9 @@ class ApiController {
     @Req() req: any,
     @Res({ passthrough: true }) res: any,
   ) {
-    const d = z
-      .object({
-        email: z.string().email(),
-        password: z.string().min(1).max(200),
-      })
-      .parse(req.body);
+    const d = loginSchema.parse(req.body);
     const admin = (
-      await db.query("SELECT * FROM admins WHERE email=$1", [
-        d.email.toLowerCase(),
-      ])
+      await db.query("SELECT * FROM admins WHERE email=$1", [d.email])
     ).rows[0];
     const valid = await argon2.verify(
       admin?.password_hash || dummyHash,
@@ -291,12 +231,10 @@ class ApiController {
     @Res({ passthrough: true }) res: any,
   ) {
     if (!(await auth(req, res))) return;
-    const d = z
-      .object({ status: z.enum(["new", "in-progress", "closed"]) })
-      .parse(req.body);
+    const d = statusSchema.parse(req.body);
     await db.query("UPDATE contacts SET status=$1 WHERE id=$2", [
       d.status,
-      z.coerce.number().int().positive().parse(id),
+      idSchema.parse(id),
     ]);
     return { ok: true };
   }
@@ -306,9 +244,7 @@ class ApiController {
     @Res({ passthrough: true }) res: any,
   ) {
     if (!(await auth(req, res))) return;
-    await db.query("DELETE FROM contacts WHERE id=$1", [
-      z.coerce.number().int().positive().parse(id),
-    ]);
+    await db.query("DELETE FROM contacts WHERE id=$1", [idSchema.parse(id)]);
     return { ok: true };
   }
   @Post("admin/posts") async save(
@@ -332,7 +268,7 @@ class ApiController {
     const d = postSchema.parse(req.body);
     await db.query(
       "UPDATE posts SET translation_key=$1,locale=$2,slug=$3,title=$4,excerpt=$5,body=$6,image=$7,image_alt=$8,published=$9,updated_at=now() WHERE id=$10",
-      [...Object.values(d), z.coerce.number().int().positive().parse(id)],
+      [...Object.values(d), idSchema.parse(id)],
     );
     return { ok: true };
   }
@@ -518,6 +454,11 @@ async function bootstrap() {
         return res.code(409).send({
           error:
             "Ese slug o traducción ya existe / Slug or translation already exists",
+        });
+      if (error.code === "23514" || error.code === "22021")
+        return res.code(400).send({
+          error: "Revisa los campos / Check the fields",
+          fields: [],
         });
       const status = error.statusCode || error.status || 500;
       if (status >= 500) console.error("API error", error.code || error.name);
