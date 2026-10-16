@@ -69,6 +69,8 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
+Guía completa de capas, comandos y límites de validación: [docs/TESTING.md](docs/TESTING.md).
+
 Las pruebas end-to-end usan exclusivamente el entorno local y sus credenciales de `.env`. Crean datos de prueba; no las ejecutes sobre producción. Verifican bilingüismo, rutas, SEO, móvil, accesibilidad automática, contactos, sesión, editor, carga de imágenes, publicación, retirada y controles de seguridad. Los tests dejan artículos QA como borradores; puedes eliminarlos directamente en una base de pruebas. Capturas en `docs/qa/`, informe en `playwright-report/`.
 
 Consulta [despliegue y operación](docs/DEPLOYMENT.md), [diseño e imagen](docs/DESIGN.md) y [resultado de validación](docs/QA.md).
