@@ -152,20 +152,26 @@ nav a:hover,
 .language-picker summary.language {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   cursor: pointer;
   list-style: none;
-  font-weight: 750;
+  font-weight: 700;
   user-select: none;
-  padding: 4px 6px;
-  border-radius: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  transition: border-color 0.15s ease, color 0.15s ease;
 }
 .language-picker summary::-webkit-details-marker {
   display: none;
 }
 .language-picker summary.language:hover,
-.language-picker summary.language:focus-visible {
-  color: var(--blue);
+.language-picker summary.language:focus-visible,
+.language-picker[open] summary.language {
+  border-color: #b0c0d0;
+  color: var(--ink);
 }
 .lang-arrow {
   font-size: 0.65rem;
@@ -180,38 +186,74 @@ nav a:hover,
   top: calc(100% + 8px);
   right: 0;
   background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  box-shadow: 0 8px 24px rgba(23, 35, 62, 0.12);
-  padding: 6px 0;
-  min-width: 140px;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.04);
+  padding: 0;
+  min-width: 220px;
   z-index: 100;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+.language-dropdown-header {
+  padding: 16px 20px 14px;
+  font-size: 0.75rem;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #646a78;
+  line-height: 1.35;
+  border-bottom: 1px solid #eff0f3;
 }
 .language-option {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
+  gap: 12px;
+  padding: 12px 20px;
   color: var(--ink);
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.95rem;
+  font-weight: 550;
   text-decoration: none;
+  background: var(--paper);
+  transition: background-color 0.15s ease;
+}
+.language-option:not(:last-child) {
+  border-bottom: 1px solid #eff0f3;
 }
 .language-option:hover,
 .language-option:focus-visible {
-  background: var(--pale);
-  color: var(--blue);
+  background: #f8fafc;
 }
 .language-option.active {
-  color: var(--blue);
-  font-weight: 750;
+  background: #f4f6f9;
+  color: #70391f;
+  font-weight: 700;
 }
-.language-option .lang-code {
-  font-weight: 750;
-  font-size: 0.75rem;
-  min-width: 20px;
+.language-option.active:hover {
+  background: #f4f6f9;
+}
+.lang-flag-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.lang-flag {
+  display: block;
+  width: 24px;
+  height: 17px;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  object-fit: cover;
+}
+.lang-name {
+  flex-grow: 1;
+}
+.lang-check {
+  margin-left: auto;
+  color: #70391f;
+  flex-shrink: 0;
 }
 .button {
   display: inline-flex;
