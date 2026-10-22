@@ -234,8 +234,8 @@ Todas las tareas asignadas al agente del repositorio han sido implementadas y ve
 | **A05** | Reglas de GitHub y entorno (W3) | **verificado** | Branch protection en `main` configurada con status check `verify` requerido (`strict: true`, `enforce_admins: true`). Entorno `production` restringido con política de despliegue exclusiva a la rama `main`. |
 | **A06** | Documentación y entrega (W4) | **verificado** | `docs/DEPLOYMENT.md` y `docs/QA.md` actualizados con el contrato W4, tabla de consumo real medido, comandos reproducibles y límites de la evidencia. |
 | **A07** | Umami (W5) | **verificado** | Integrado en C4: script cargado con `defer` y `data-do-not-track="true"` en `Layout.astro`, CSP configurada y política de privacidad actualizada. |
-| **A08** | Newsletter con Listmonk (W5) | **pendiente** | Endpoint `POST https://news.yunitztech.com/api/public/subscription` y lista `ab7fa355-30e9-4d40-bcfa-d3a965951e3b`. Pendiente componente de formulario, endpoint intermedio con protección anti-spam, confirmación y doble opt-in. |
-| **A09** | SMTP (W5) | **pendiente** | Servidor `mail.yunitztech.com:465`. Pendiente provisión de credenciales por infraestructura, transporte con reintentos/timeout y definición de eventos (notificaciones al administrador o confirmación al remitente). |
+| **A08** | Newsletter con Listmonk (W5) | **pendiente (código web)** | Infraestructura lista: `POST https://news.yunitztech.com/api/public/subscription` responde y lista configurada con doble opt-in. Variables `LISTMONK_URL` y `LISTMONK_LIST_UUID` inyectadas por Coolify (`web_imagenes.yml`). Pendiente en código: propagar variables a `api` en `compose.prod.yml`, crear endpoint intermedio con protección anti-spam, componente UI multilingüe y estados de confirmación. |
+| **A09** | SMTP (W5) | **pendiente (código web)** | Infraestructura lista: servidor `mail.yunitztech.com:465` (TLS). Variables inyectadas por Coolify: `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER` (`no-reply@yunitztech.com`), `SMTP_PASSWORD` y `MAIL_FROM`. Pendiente en código: propagar variables a `api` en `compose.prod.yml` (regla INT-04), definir eventos a notificar y transporte con timeout/reintentos. |
 | **A10** | Job deploy con POST (W6) | **verificado** | Modificado `.github/workflows/deploy.yml` para emitir `--request POST` en la llamada con `$COOLIFY_WEBHOOK` y token Bearer, satisfaciendo el endpoint de Coolify 4.3.23. |
 
 
@@ -354,15 +354,24 @@ Contexto: La web está en producción desde el 27 de septiembre de 2026 (commit 
 - CSP autoriza la carga y conexión de Umami sin violaciones de política de seguridad.
 - Pruebas E2E y suites de verificación en verde.
 
-## Tareas pendientes y backlog operativo (W5 e Infraestructura)
+## Estado del backlog operativo y tareas pendientes
 
-Las tareas siguientes quedan formalmente registradas como **pendientes** para abordar en siguientes iteraciones según las prioridades del proyecto:
+Revisión y validación técnica (2026-10-21): Se verificó el estado de los puntos operativos y de infraestructura. Los aspectos de infraestructura están completados y operativos en producción. Los únicos pendientes reales corresponden al código de la aplicación web (P1 y P2).
 
-| ID | Área | Tarea | Estado | Detalle y requisitos pendientes |
+### 1. Puntos operativos e infraestructura cerrados
+
+| ID / Punto | Estado | Validación y evidencia |
+| --- | --- | --- |
+| **Despliegue automático (`POSTGRES18_MIGRATION_READY`)** | **Cerrado** | La variable `POSTGRES18_MIGRATION_READY` está en `true` desde el 2026-09-28. `compose.prod.yml` corre con `postgres:18.6-alpine` y volumen `pgdata18`. El pipeline (`verify`, `publish`, `deploy`) despliega automáticamente en cada merge a `main` y `https://yunitztech.com/version.json` refleja el SHA correspondiente. |
+| **P4 — Despliegue solo por webhook** | **Cerrado** | `roles/cliente/tasks/web_imagenes.yml:54` establece `is_auto_deploy_enabled: false` en Coolify. El webhook `POST` (`COOLIFY_WEBHOOK`) y su token Bearer (`COOLIFY_TOKEN`) están activos en el entorno `production` de GitHub, impidiendo despliegues fuera del flujo validado por CI. |
+| **P3 — Respaldos programados externos** | **Cerrado** | El rol `backup` ejecuta a diario a las 03:30 UTC un `pg_dumpall` de todas las instancias PostgreSQL y copia los volúmenes `*_uploads`. Todo se transfiere con `restic` a Google Drive y a una réplica secundaria con retención de 7 días, 4 semanas y 6 meses. Sin tareas pendientes para el equipo web. |
+
+### 2. Tareas pendientes reales (Código de la aplicación web)
+
+| ID | Área | Tarea | Estado | Detalle y trabajo pendiente en código |
 | --- | --- | --- | --- | --- |
-| **P1** | Funcionalidad / Marketing | Newsletter con Listmonk (`W5-Listmonk`) | **Pendiente** | Integración del formulario de suscripción a newsletter vía `POST https://news.yunitztech.com/api/public/subscription` (lista `ab7fa355-30e9-4d40-bcfa-d3a965951e3b`). Requiere: diseñar el componente UI (ES/EN), crear ruta proxy en backend con validación/anti-spam (Cloudflare Turnstile o similar), manejo de estados de confirmación y flujo de doble opt-in. |
-| **P2** | Funcionalidad / Comunicaciones | Servidor de correo SMTP (`W5-SMTP`) | **Pendiente** | Integración del servicio de correo vía `mail.yunitztech.com:465` (TLS). Requiere: provisión de credenciales seguras por infraestructura, implementar transporte SMTP con timeout y reintentos, y definir qué eventos del sitio enviarán correo (notificaciones de contacto al administrador o acuse de recibo al usuario). |
-| **P3** | Infraestructura / Operativa | Respaldos programados externos | **Pendiente** | Automatizar respaldos periódicos de la base de datos PostgreSQL (`pgdata` vía `pg_dump`) y del volumen persistente de medios (`uploads`) hacia almacenamiento externo seguro, definiendo política de retención y cifrado. |
-| **P4** | Infraestructura / Operativa | Verificación de despliegue exclusivo por webhook en Coolify | **Pendiente** | Verificar en el panel de Coolify que el autodespliegue por push de Git esté desactivado, garantizando que todo despliegue sea activado únicamente por el webhook `POST` de GitHub Actions tras pasar `verify` y `publish`. |
+| **P1** | Funcionalidad / Marketing | Newsletter con Listmonk (`W5-Listmonk`) | **Pendiente (Código web)** | **Infraestructura lista:** `https://news.yunitztech.com/api/public/subscription` responde y la lista `ab7fa355-30e9-4d40-bcfa-d3a965951e3b` tiene doble opt-in activo. Coolify provee `LISTMONK_URL` y `LISTMONK_LIST_UUID`.<br>**Pendiente en código:**<br>1. Propagar `LISTMONK_URL` y `LISTMONK_LIST_UUID` al servicio `api` en `compose.prod.yml` (opcionales por defecto).<br>2. Crear endpoint intermedio en backend con validación y protección anti-spam.<br>3. Diseñar componente de suscripción en frontend (multilingüe) con estados de confirmación y aviso de doble opt-in. |
+| **P2** | Funcionalidad / Comunicaciones | Servidor de correo SMTP (`W5-SMTP`) | **Pendiente (Código web)** | **Infraestructura lista:** Servidor `mail.yunitztech.com:465` (TLS implícito). Coolify inyecta en el entorno: `SMTP_HOST`, `SMTP_PORT` (465), `SMTP_SECURE`, `SMTP_USER` (`no-reply@yunitztech.com`), `SMTP_PASSWORD` y `MAIL_FROM` (`web_imagenes.yml:111`).<br>**Pendiente en código:**<br>1. Propagar estas variables con esos mismos nombres a `api` en `compose.prod.yml` (regla INT-04).<br>2. Definir los eventos a notificar (ej. aviso al administrador al recibir contactos en `/api/contact`).<br>3. Implementar transporte SMTP en Node con timeout y reintentos, asegurando que un fallo de correo nunca bloquee ni descarte el contacto en base de datos. |
+
 
 
