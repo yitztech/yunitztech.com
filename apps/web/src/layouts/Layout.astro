@@ -74,6 +74,16 @@ const langAriaLabels: Record<Locale, string> = {
   pt: "Mudar idioma",
 };
 
+const siteInLangHeader: Record<Locale, string> = {
+  es: "Ver este sitio en español",
+  en: "View this site in English",
+  fr: "Voir ce site en français",
+  de: "Diese Website auf Deutsch anzeigen",
+  pt: "Ver este site em português",
+};
+
+const displayLocales: Locale[] = ["es", "en", "pt", "de", "fr"];
+
 const skipTexts: Record<Locale, string> = {
   es: "Saltar al contenido",
   en: "Skip to content",
@@ -224,7 +234,10 @@ const taglineBottom: Record<Locale, string> = {
               <span aria-hidden="true" class="lang-arrow">▾</span>
             </summary>
             <div class="language-dropdown">
-              {supportedLocales.map((l) => (
+              <div class="language-dropdown-header">
+                {siteInLangHeader[currentLang]}
+              </div>
+              {displayLocales.map((l) => (
                 <a
                   class={`language-option ${l === currentLang ? "active" : ""}`}
                   href={resolvedAlternates[l]}
@@ -232,8 +245,103 @@ const taglineBottom: Record<Locale, string> = {
                   hreflang={l}
                   aria-current={l === currentLang ? "true" : undefined}
                 >
-                  <span class="lang-code">{l.toUpperCase()}</span>
+                  <span class="lang-flag-wrap">
+                    {l === "es" && (
+                      <svg class="lang-flag" viewBox="0 0 640 480" width="24" height="17" aria-hidden="true">
+                        <rect width="640" height="120" fill="#aa151b" />
+                        <rect y="120" width="640" height="240" fill="#f1bf00" />
+                        <rect y="360" width="640" height="120" fill="#aa151b" />
+                        <g transform="translate(130, 160) scale(0.65)">
+                          <path d="M20,40 Q50,20 80,40 L75,55 L25,55 Z" fill="#aa151b" />
+                          <circle cx="50" cy="20" r="5" fill="#f1bf00" />
+                          <circle cx="20" cy="38" r="4" fill="#f1bf00" />
+                          <circle cx="80" cy="38" r="4" fill="#f1bf00" />
+                          <rect x="5" y="45" width="8" height="75" fill="#c4c9d4" rx="2" />
+                          <rect x="87" y="45" width="8" height="75" fill="#c4c9d4" rx="2" />
+                          <path d="M22,60 H78 V95 Q78,125 50,135 Q22,125 22,95 Z" fill="#aa151b" stroke="#aa151b" stroke-width="2" />
+                          <path d="M25,62 H75 V95 Q75,122 50,132 Q25,122 25,95 Z" fill="#f1bf00" />
+                          <path d="M25,62 H50 V97 H25 Z" fill="#aa151b" />
+                          <path d="M50,97 H75 Q75,122 50,132 Z" fill="#aa151b" />
+                        </g>
+                      </svg>
+                    )}
+                    {l === "en" && (
+                      <svg class="lang-flag" viewBox="0 0 640 480" width="24" height="17" aria-hidden="true">
+                        <rect width="640" height="480" fill="#b22234" />
+                        <path d="M0,36.92h640v36.92H0z M0,110.77h640v36.92H0z M0,184.62h640v36.92H0z M0,258.46h640v36.92H0z M0,332.31h640v36.92H0z M0,406.15h640v36.92H0z" fill="#ffffff" />
+                        <rect width="256" height="258.46" fill="#3c3b6e" />
+                        <g fill="#ffffff">
+                          <circle cx="20" cy="30" r="7" />
+                          <circle cx="60" cy="30" r="7" />
+                          <circle cx="100" cy="30" r="7" />
+                          <circle cx="140" cy="30" r="7" />
+                          <circle cx="180" cy="30" r="7" />
+                          <circle cx="220" cy="30" r="7" />
+                          <circle cx="40" cy="80" r="7" />
+                          <circle cx="80" cy="80" r="7" />
+                          <circle cx="120" cy="80" r="7" />
+                          <circle cx="160" cy="80" r="7" />
+                          <circle cx="200" cy="80" r="7" />
+                          <circle cx="20" cy="130" r="7" />
+                          <circle cx="60" cy="130" r="7" />
+                          <circle cx="100" cy="130" r="7" />
+                          <circle cx="140" cy="130" r="7" />
+                          <circle cx="180" cy="130" r="7" />
+                          <circle cx="220" cy="130" r="7" />
+                          <circle cx="40" cy="180" r="7" />
+                          <circle cx="80" cy="180" r="7" />
+                          <circle cx="120" cy="180" r="7" />
+                          <circle cx="160" cy="180" r="7" />
+                          <circle cx="200" cy="180" r="7" />
+                          <circle cx="20" cy="230" r="7" />
+                          <circle cx="60" cy="230" r="7" />
+                          <circle cx="100" cy="230" r="7" />
+                          <circle cx="140" cy="230" r="7" />
+                          <circle cx="180" cy="230" r="7" />
+                          <circle cx="220" cy="230" r="7" />
+                        </g>
+                      </svg>
+                    )}
+                    {l === "pt" && (
+                      <svg class="lang-flag" viewBox="0 0 640 480" width="24" height="17" aria-hidden="true">
+                        <rect width="640" height="480" fill="#009739" />
+                        <polygon points="320,50 590,240 320,430 50,240" fill="#fedd00" />
+                        <circle cx="320" cy="240" r="110" fill="#012169" />
+                        <path d="M216,252 a110,110 0 0,0 208,-24 a116,116 0 0,1 -208,24" fill="#ffffff" />
+                      </svg>
+                    )}
+                    {l === "de" && (
+                      <svg class="lang-flag" viewBox="0 0 640 480" width="24" height="17" aria-hidden="true">
+                        <rect width="640" height="160" fill="#000000" />
+                        <rect y="160" width="640" height="160" fill="#dd0000" />
+                        <rect y="320" width="640" height="160" fill="#ffce00" />
+                      </svg>
+                    )}
+                    {l === "fr" && (
+                      <svg class="lang-flag" viewBox="0 0 640 480" width="24" height="17" aria-hidden="true">
+                        <rect width="213.3" height="480" fill="#002654" />
+                        <rect x="213.3" width="213.4" height="480" fill="#ffffff" />
+                        <rect x="426.7" width="213.3" height="480" fill="#ce1126" />
+                      </svg>
+                    )}
+                  </span>
                   <span class="lang-name">{langNames[l]}</span>
+                  {l === currentLang && (
+                    <svg
+                      class="lang-check"
+                      aria-hidden="true"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  )}
                 </a>
               ))}
             </div>
