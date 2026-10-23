@@ -82,7 +82,7 @@ Adicionalmente:
 
 ### Tabla de consumo y límites medidos
 
-Medición realizada el 2026-09-27 sobre Linux aarch64 (OrbStack / Docker 2 CPU, host macOS) ejecutando las imágenes reales de producción con carga de subida de 5 MB (20 MP) y login concurrente con Argon2:
+Medición realizada el 2026-09-27 sobre Linux aarch64 (Docker 2 CPU, host macOS) ejecutando las imágenes reales de producción con carga de subida de 5 MB (20 MP) y login concurrente con Argon2:
 
 | Servicio | Techo Memoria | Techo CPU | `NODE_OPTIONS` | Reposo medio (MiB) | Pico observado (MiB) | Pico CPU (%) | Pico cgroup (`memory.peak`) | Reinicios | OOMKilled |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
