@@ -65,7 +65,7 @@ Medición bajo carga real realizada con 60 segundos de reposo previo y ejecució
 
 ## Comandos para reproducir la verificación localmente
 
-Para ejecutar la verificación completa sin entrar en conflicto con un entorno de desarrollo que ya ocupe el puerto 8080:
+Para ejecutar la verificación completa sin entrar en conflicto con otro proyecto que ya ocupe el puerto 8080:
 
 ```bash
 # Ejecutar verificación de producción en puertos alternativos
@@ -76,6 +76,6 @@ En el entorno de integración continua (GitHub Actions), el script se ejecuta di
 
 ## Límites de la evidencia
 
-- Las mediciones anteriores corresponden a arquitectura ARM64 (Apple Silicon / OrbStack Docker VM). En el servidor de producción (x86_64 / AMD64), los consumos de memoria nativa de libvips y Node pueden diferir ligeramente pero se mantendrán holgadamente bajo los techos establecidos.
+- Las mediciones anteriores corresponden a arquitectura ARM64 (Apple Silicon / máquina virtual de Docker). En el servidor de producción (x86_64 / AMD64), los consumos de memoria nativa de libvips y Node pueden diferir ligeramente pero se mantendrán holgadamente bajo los techos establecidos.
 - El pipeline de CI en GitHub Actions compila y prueba imágenes para la arquitectura del runner.
 - No se han modificado credenciales ni configuraciones del servidor remoto de Coolify desde este repositorio.

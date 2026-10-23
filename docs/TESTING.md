@@ -15,7 +15,7 @@ Todo junto: `npm run test:all` (unitarias + BD + e2e). Lo que corre en CI: `npm 
 ## Requisitos
 
 - `test:db` necesita Docker: `scripts/test-db.sh` levanta `compose.test.yml` (Postgres sin volumen, puerto `55432`) y lo elimina al terminar. Con `DB_TEST_URL` apunta a una base **desechable** ya existente (el esquema `public` se borra).
-- `test:api`, `test:web` y `test:smoke` necesitan el stack en marcha (`TEST_URL`, por defecto `http://localhost:8080`) y `ADMIN_EMAIL`/`ADMIN_PASSWORD` (o `.env`). En CI las ejecuta `scripts/verify-production.sh` sobre las imágenes de producción.
+- `test:api`, `test:web` y `test:smoke` necesitan el stack en marcha (`TEST_URL`, por defecto `http://localhost:8086`) y `ADMIN_EMAIL`/`ADMIN_PASSWORD` (o `.env`). En CI las ejecuta `scripts/verify-production.sh` sobre las imágenes de producción.
 - Los escenarios Gherkin (`tests/bdd/features/{api,web}/*.feature`, en español) usan una IP simulada por escenario vía `X-Forwarded-For` para no agotar los límites de tasa (5 contactos/hora, 5 logins/15 min). Funciona cuando el gateway confía en el proxy (`TRUSTED_PROXY_CIDR`, como en CI); contra el stack de desarrollo (`compose.dev.yml`) todas las peticiones comparten IP y los escenarios de contacto/login pueden recibir 429: espera o reinicia la API.
 - Las pruebas crean contactos y artículos QA. Los artículos se despublican al terminar (no hay borrado por API); no las ejecutes contra producción.
 

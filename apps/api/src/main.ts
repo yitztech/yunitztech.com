@@ -37,7 +37,7 @@ import {
   viewSchema,
 } from "./validation";
 sharp.concurrency(1);
-const origin = process.env.SITE_URL || "http://localhost:8080";
+const origin = process.env.SITE_URL || "http://localhost:8086";
 function isAllowedOrigin(clientOrigin?: string): boolean {
   if (!clientOrigin) return false;
   if (clientOrigin === origin) return true;

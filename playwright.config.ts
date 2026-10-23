@@ -8,7 +8,7 @@ export default defineConfig({
   workers: 1,
   timeout: 45000,
   use: {
-    baseURL: process.env.TEST_URL || "http://localhost:8080",
+    baseURL: process.env.TEST_URL || "http://localhost:8086",
     headless: !!process.env.CI,
     ignoreHTTPSErrors: process.env.TEST_INSECURE_TLS === "1",
     screenshot: "only-on-failure",

@@ -45,7 +45,7 @@ test("Production gateway health, revision, CSP, HSTS and compiled assets", async
   page,
   request,
 }) => {
-  const httpUrl = process.env.TEST_HTTP_URL || process.env.TEST_URL || "http://localhost:8080";
+  const httpUrl = process.env.TEST_HTTP_URL || process.env.TEST_URL || "http://localhost:8086";
   for (const path of ["/", "/politica-de-privacidad", "/version.json", "/health", "/api/health"]) {
     const res = await request.get(httpUrl + path);
     expect(res.status(), `Status 200 for ${path}`).toBe(200);
@@ -251,7 +251,7 @@ test("CMS uploads, publishes, renders safely and unpublishes without rebuild", a
     expect(statSync(uploadImage).size).toBeLessThanOrEqual(5 * 1024 * 1024);
   }
   const concurrentPage = await browser.newPage({
-    baseURL: process.env.TEST_URL || "http://localhost:8080",
+    baseURL: process.env.TEST_URL || "http://localhost:8086",
     ignoreHTTPSErrors: true,
   });
   await Promise.all([
@@ -303,7 +303,7 @@ test("Authentication, CSRF, input validation and image restrictions", async ({
   expect(
     (
       await request.post("/api/contact", {
-        headers: { Origin: process.env.TEST_URL || "http://localhost:8080" },
+        headers: { Origin: process.env.TEST_URL || "http://localhost:8086" },
         data: { name: "A" },
       })
     ).status(),
@@ -311,7 +311,7 @@ test("Authentication, CSRF, input validation and image restrictions", async ({
   expect(
     (
       await request.post("/api/admin/posts", {
-        headers: { Origin: process.env.TEST_URL || "http://localhost:8080" },
+        headers: { Origin: process.env.TEST_URL || "http://localhost:8086" },
         data: {},
       })
     ).status(),
@@ -389,7 +389,7 @@ test("Login attempts are rate limited", async ({ request }) => {
     statuses.push(
       (
         await request.post("/api/login", {
-          headers: { Origin: process.env.TEST_URL || "http://localhost:8080" },
+          headers: { Origin: process.env.TEST_URL || "http://localhost:8086" },
           data: {
             email: "missing@example.test",
             password: "invalid-test-password",

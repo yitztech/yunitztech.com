@@ -1,5 +1,5 @@
 export const siteUrl = (
-  process.env.SITE_URL || "http://localhost:8080"
+  process.env.SITE_URL || "http://localhost:8086"
 ).replace(/\/$/, "");
 export async function api(path: string) {
   const response = await fetch(
