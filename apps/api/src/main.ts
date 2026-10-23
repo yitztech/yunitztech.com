@@ -47,8 +47,7 @@ function isAllowedOrigin(clientOrigin?: string): boolean {
       if (
         u.hostname === "localhost" ||
         u.hostname === "127.0.0.1" ||
-        u.hostname === "orb.local" ||
-        u.hostname.endsWith(".orb.local")
+        u.hostname.endsWith(".localhost")
       ) {
         return true;
       }
@@ -145,7 +144,8 @@ class ApiController {
       if (
         host === new URL(origin).hostname ||
         host === req.headers.host?.split(":")[0] ||
-        host.endsWith(".orb.local")
+        host === "localhost" ||
+        host.endsWith(".localhost")
       )
         host = "internal";
     } catch {}
