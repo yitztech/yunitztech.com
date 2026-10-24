@@ -19,4 +19,4 @@ const file = fromDotenv();
 export const adminEmail = process.env.ADMIN_EMAIL || file.ADMIN_EMAIL || "";
 export const adminPassword =
   process.env.ADMIN_PASSWORD || file.ADMIN_PASSWORD || "";
-export const siteOrigin = process.env.TEST_URL || "http://localhost:8080";
+export const siteOrigin = process.env.TEST_URL || "http://localhost:8086";

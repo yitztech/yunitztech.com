@@ -1,9 +1,27 @@
 CREATE TABLE IF NOT EXISTS admins (id serial PRIMARY KEY, email text UNIQUE NOT NULL, password_hash text NOT NULL);
 CREATE TABLE IF NOT EXISTS sessions (token_hash text PRIMARY KEY, admin_id integer NOT NULL REFERENCES admins(id), expires_at timestamptz NOT NULL);
+CREATE TABLE IF NOT EXISTS admin_password_resets (
+  token_hash text PRIMARY KEY,
+  admin_id integer NOT NULL REFERENCES admins(id) ON DELETE CASCADE,
+  expires_at timestamptz NOT NULL,
+  used_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
 CREATE TABLE IF NOT EXISTS contacts (id serial PRIMARY KEY, name text NOT NULL, email text NOT NULL, company text NOT NULL, service text NOT NULL, message text NOT NULL, locale text NOT NULL, consent_version text NOT NULL DEFAULT '2026-09', status text NOT NULL DEFAULT 'new', created_at timestamptz NOT NULL DEFAULT now());
 CREATE TABLE IF NOT EXISTS posts (id serial PRIMARY KEY, translation_key text NOT NULL, locale text NOT NULL CHECK(locale IN ('es','en','fr','de','pt')), slug text NOT NULL, title text NOT NULL, excerpt text NOT NULL, body text NOT NULL, image text NOT NULL DEFAULT '/images/mvp-studio.webp', image_alt text NOT NULL DEFAULT '', published boolean NOT NULL DEFAULT false, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now(), UNIQUE(locale,slug), UNIQUE(translation_key,locale));
 CREATE TABLE IF NOT EXISTS settings (locale text PRIMARY KEY CHECK(locale IN ('es','en','fr','de','pt')), content jsonb NOT NULL);
 CREATE TABLE IF NOT EXISTS page_views (day date NOT NULL DEFAULT CURRENT_DATE, path text NOT NULL, referrer text NOT NULL, count integer NOT NULL DEFAULT 1, PRIMARY KEY(day,path,referrer));
+CREATE TABLE IF NOT EXISTS contact_notifications (
+  id bigserial PRIMARY KEY,
+  contact_id integer NOT NULL UNIQUE REFERENCES contacts(id) ON DELETE CASCADE,
+  attempts integer NOT NULL DEFAULT 0 CHECK (attempts >= 0),
+  next_attempt_at timestamptz NOT NULL DEFAULT now(),
+  sent_at timestamptz,
+  last_error text,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS contact_notifications_pending_idx
+  ON contact_notifications(next_attempt_at, id) WHERE sent_at IS NULL;
 
 -- Restricciones CHECK que replican las reglas de validation.ts. Se añaden como
 -- NOT VALID para no bloquear despliegues con filas antiguas: se aplican a toda

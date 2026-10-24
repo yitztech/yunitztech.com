@@ -15,11 +15,11 @@ cp .env.example .env
 docker compose -f compose.dev.yml up -d --build
 ```
 
-Sitio: http://localhost:8080 · Inglés: http://localhost:8080/en/ · Panel: http://localhost:8080/admin.
+Sitio: http://localhost:8086 · Inglés: http://localhost:8086/en/ · Panel: http://localhost:8086/admin.
 
 En esta entrega ya existe `.env` local con secretos aleatorios para pruebas, excluido de Git y con permisos 0600. Consulta ese archivo localmente para acceder al panel; no uses estas credenciales en producción. El usuario inicial se crea solo cuando su correo no existe. Cambiar `ADMIN_PASSWORD` no cambia una cuenta existente: utiliza el comando de recuperación documentado abajo.
 
-El único puerto de desarrollo publicado es `127.0.0.1:8080`. Nginx, Astro, API y PostgreSQL son servicios separados. La API se compila al iniciar; tras modificarla ejecuta `docker compose -f compose.dev.yml restart api`. Astro recarga los cambios automáticamente.
+El único puerto de desarrollo publicado es `127.0.0.1:8086`. Nginx, Astro, API y PostgreSQL son servicios separados. La API se compila al iniciar; tras modificarla ejecuta `docker compose -f compose.dev.yml restart api`. Astro recarga los cambios automáticamente.
 
 ```sh
 docker compose -f compose.dev.yml logs --tail 50 api web nginx
@@ -41,7 +41,7 @@ El editor usa texto y subtítulos `##`, no HTML arbitrario. Para evitar código 
 
 ## Alcance
 
-Los servicios de tiendas, reservaciones, listas de correo, aplicaciones y automatización se presentan como la oferta de la empresa. Esta entrega es su sitio comercial y CMS; no implementa una tienda ni una plataforma de reservaciones para terceros. El contacto se recibe en el panel; no se envían notificaciones por email sin un proveedor SMTP configurado.
+Los servicios de tiendas, reservaciones, listas de correo, aplicaciones y automatización se presentan como la oferta de la empresa. Esta entrega es su sitio comercial y CMS; no implementa una tienda ni una plataforma de reservaciones para terceros. El contacto se recibe en el panel. Si SMTP está configurado, también se envía un aviso mediante una cola persistente con reintentos; si no, los mensajes siguen disponibles en el panel y los avisos permanecen pendientes.
 
 Se eligió un backend modular sencillo, sin Kubernetes, Redis ni microservicios innecesarios para esta carga. El listado de experiencia técnica orienta la oferta, pero no se convierte en una lista de tecnologías en la portada.
 

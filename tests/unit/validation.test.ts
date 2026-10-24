@@ -3,6 +3,9 @@ import assert from "node:assert/strict";
 import {
   LIMITS,
   contactSchema,
+  changePasswordSchema,
+  passwordResetSchema,
+  passwordResetRequestSchema,
   idSchema,
   imagePath,
   loginSchema,
@@ -382,5 +385,29 @@ describe("loginSchema, statusSchema, idSchema, imagePath", () => {
   test("imagePath", () => {
     ok(imagePath, "/images/a-b_c.avif");
     bad(imagePath, "/images/a.png");
+  });
+});
+
+describe("administrative password flows", () => {
+  test("requires the current password and a 16-character replacement", () => {
+    ok(changePasswordSchema, {
+      currentPassword: "current",
+      newPassword: "x".repeat(16),
+    });
+    bad(changePasswordSchema, {
+      currentPassword: "current",
+      newPassword: "x".repeat(15),
+    });
+  });
+  test("normalizes recovery email and accepts only random hex tokens", () => {
+    assert.equal(
+      passwordResetRequestSchema.parse({ email: " ADMIN@example.com " }).email,
+      "admin@example.com",
+    );
+    bad(passwordResetSchema, { token: "bad", password: "x".repeat(16) });
+    ok(passwordResetSchema, {
+      token: "a".repeat(64),
+      password: "x".repeat(16),
+    });
   });
 });

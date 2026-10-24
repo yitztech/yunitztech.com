@@ -226,7 +226,7 @@ Todas las tareas asignadas al agente del repositorio han sido implementadas y ve
 
 | ID | Entrega | Estado | Evidencias y resultados |
 | --- | --- | --- | --- |
-| **A00** | Confirmar base y contrato | **verificado** | Base Git `0fdfe52`, Docker OrbStack (Linux aarch64, 2 NCPU, 3.12 GiB RAM), Node v22. Contrato W4 preserved. |
+| **A00** | Confirmar base y contrato | **verificado** | Base Git `0fdfe52`, Docker en macOS (Linux aarch64, 2 NCPU, 3.12 GiB RAM), Node v22. Contrato W4 preserved. |
 | **A01** | Límites y Sharp (W1) | **verificado** | `compose.prod.yml` con límites (gateway: 64M/0.25, web: 256M/0.5, api: 512M/1.0, db: 256M/0.5), `NODE_OPTIONS` y `sharp.concurrency(1)` en `apps/api/src/main.ts`. `npm run check` y `npm test` pasando. |
 | **A02** | Medición reproducible y prueba de pico (W1) | **verificado** | Imagen de prueba: JPEG sintético 5 023 217 bytes, 4000x5000 (20 MP), SHA256 `db7c403a771b6a40d3a14ddf2a57e801dea7d869795d96a26fa51838797f40ff`. Subida y login concurrente (Sharp + Argon2). 0 reinicios, 0 OOM (`oom=0`, `oom_kill=0`). Pico API cgroup 159 MiB vs techo 512 MiB. |
 | **A03** | Entorno de prueba de producción en CI (W2) | **verificado** | `compose.ci.yml` mapea loopback 8080. `scripts/verify-production.sh` automatiza build de targets de prod, IPAM dynamic subnet discovery para `TRUSTED_PROXY_CIDR`, proxy TLS efímero en 18443, cookies `Secure; HttpOnly; SameSite=Strict`. Integrado en `.github/workflows/deploy.yml`. |

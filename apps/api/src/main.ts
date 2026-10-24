@@ -26,8 +26,16 @@ import argon2 from "argon2";
 import sharp from "sharp";
 import { ZodError } from "zod";
 import { db } from "./db";
+import { runMigrations } from "./migrations";
+import {
+  sendAdminPasswordReset,
+  startContactNotificationWorker,
+} from "./contact-notifications";
 import {
   contactSchema,
+  changePasswordSchema,
+  passwordResetRequestSchema,
+  passwordResetSchema,
   idSchema,
   locale,
   loginSchema,
@@ -37,7 +45,7 @@ import {
   viewSchema,
 } from "./validation";
 sharp.concurrency(1);
-const origin = process.env.SITE_URL || "http://localhost:8080";
+const origin = process.env.SITE_URL || "http://localhost:8086";
 function isAllowedOrigin(clientOrigin?: string): boolean {
   if (!clientOrigin) return false;
   if (clientOrigin === origin) return true;
@@ -47,8 +55,7 @@ function isAllowedOrigin(clientOrigin?: string): boolean {
       if (
         u.hostname === "localhost" ||
         u.hostname === "127.0.0.1" ||
-        u.hostname === "orb.local" ||
-        u.hostname.endsWith(".orb.local")
+        u.hostname.endsWith(".localhost")
       ) {
         return true;
       }
@@ -124,17 +131,31 @@ class ApiController {
   @Post("contact") async contact(@Req() req: any) {
     const data = contactSchema.parse(req.body);
     if (data.website) return { ok: true };
-    await db.query(
-      "INSERT INTO contacts(name,email,company,service,message,locale) VALUES($1,$2,$3,$4,$5,$6)",
-      [
-        data.name,
-        data.email,
-        data.company,
-        data.service,
-        data.message,
-        data.locale,
-      ],
-    );
+    const client = await db.connect();
+    try {
+      await client.query("BEGIN");
+      const result = await client.query<{ id: number }>(
+        "INSERT INTO contacts(name,email,company,service,message,locale) VALUES($1,$2,$3,$4,$5,$6) RETURNING id",
+        [
+          data.name,
+          data.email,
+          data.company,
+          data.service,
+          data.message,
+          data.locale,
+        ],
+      );
+      await client.query(
+        "INSERT INTO contact_notifications(contact_id) VALUES($1)",
+        [result.rows[0].id],
+      );
+      await client.query("COMMIT");
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
     return { ok: true };
   }
   @Post("view") async view(@Req() req: any) {
@@ -145,7 +166,8 @@ class ApiController {
       if (
         host === new URL(origin).hostname ||
         host === req.headers.host?.split(":")[0] ||
-        host.endsWith(".orb.local")
+        host === "localhost" ||
+        host.endsWith(".localhost")
       )
         host = "internal";
     } catch {}
@@ -185,6 +207,71 @@ class ApiController {
     });
     return { ok: true };
   }
+  @Post("password-reset/request") async requestPasswordReset(@Req() req: any) {
+    const { email } = passwordResetRequestSchema.parse(req.body);
+    const admin = (
+      await db.query("SELECT id,email FROM admins WHERE email=$1", [email])
+    ).rows[0];
+    if (admin) {
+      const token = randomBytes(32).toString("hex");
+      await db.query("DELETE FROM admin_password_resets WHERE admin_id=$1", [
+        admin.id,
+      ]);
+      await db.query(
+        "INSERT INTO admin_password_resets(token_hash,admin_id,expires_at) VALUES($1,$2,now()+interval '1 hour')",
+        [digest(token), admin.id],
+      );
+      const resetUrl = `${origin}/admin#reset=${encodeURIComponent(token)}`;
+      void sendAdminPasswordReset(admin.email, resetUrl).catch(() =>
+        console.error("Admin password reset email delivery failed"),
+      );
+    }
+    return {
+      ok: true,
+      message:
+        "Si el correo corresponde a una cuenta, recibirás instrucciones.",
+    };
+  }
+  @Post("password-reset/complete") async completePasswordReset(
+    @Req() req: any,
+    @Res({ passthrough: true }) res: any,
+  ) {
+    const data = passwordResetSchema.parse(req.body);
+    const client = await db.connect();
+    try {
+      await client.query("BEGIN");
+      const reset = (
+        await client.query(
+          "SELECT admin_id FROM admin_password_resets WHERE token_hash=$1 AND used_at IS NULL AND expires_at>now() FOR UPDATE",
+          [digest(data.token)],
+        )
+      ).rows[0];
+      if (!reset) {
+        await client.query("ROLLBACK");
+        res.code(400);
+        return { error: "El enlace venció o ya fue utilizado." };
+      }
+      await client.query("UPDATE admins SET password_hash=$1 WHERE id=$2", [
+        await argon2.hash(data.password),
+        reset.admin_id,
+      ]);
+      await client.query("DELETE FROM sessions WHERE admin_id=$1", [
+        reset.admin_id,
+      ]);
+      await client.query(
+        "UPDATE admin_password_resets SET used_at=now() WHERE token_hash=$1",
+        [digest(data.token)],
+      );
+      await client.query("COMMIT");
+      res.clearCookie("session", { path: "/api" });
+      return { ok: true };
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
   @Post("logout") async logout(
     @Req() req: any,
     @Res({ passthrough: true }) res: any,
@@ -193,6 +280,46 @@ class ApiController {
       await db.query("DELETE FROM sessions WHERE token_hash=$1", [
         digest(req.cookies.session),
       ]);
+    res.clearCookie("session", { path: "/api" });
+    return { ok: true };
+  }
+  @Post("admin/change-password") async changePassword(
+    @Req() req: any,
+    @Res({ passthrough: true }) res: any,
+  ) {
+    if (!(await auth(req, res))) return;
+    const data = changePasswordSchema.parse(req.body);
+    const token = req.cookies.session;
+    const session = (
+      await db.query(
+        "SELECT a.id,a.password_hash FROM sessions s JOIN admins a ON a.id=s.admin_id WHERE s.token_hash=$1 AND s.expires_at>now()",
+        [digest(token)],
+      )
+    ).rows[0];
+    if (
+      !session ||
+      !(await argon2.verify(session.password_hash, data.currentPassword))
+    ) {
+      res.code(401);
+      return { error: "Contraseña actual incorrecta" };
+    }
+    const client = await db.connect();
+    try {
+      await client.query("BEGIN");
+      await client.query("UPDATE admins SET password_hash=$1 WHERE id=$2", [
+        await argon2.hash(data.newPassword),
+        session.id,
+      ]);
+      await client.query("DELETE FROM sessions WHERE admin_id=$1", [
+        session.id,
+      ]);
+      await client.query("COMMIT");
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
     res.clearCookie("session", { path: "/api" });
     return { ok: true };
   }
@@ -350,17 +477,7 @@ async function bootstrap() {
   await mkdir(uploads, { recursive: true });
   dummyHash = await argon2.hash(randomBytes(32));
   await db.query(await readFile(join(__dirname, "../src/schema.sql"), "utf8"));
-  await db.query(`
-    DO $$
-    BEGIN
-      ALTER TABLE posts DROP CONSTRAINT IF EXISTS posts_locale_check;
-      ALTER TABLE posts ADD CONSTRAINT posts_locale_check CHECK (locale IN ('es','en','fr','de','pt'));
-      ALTER TABLE settings DROP CONSTRAINT IF EXISTS settings_locale_check;
-      ALTER TABLE settings ADD CONSTRAINT settings_locale_check CHECK (locale IN ('es','en','fr','de','pt'));
-    EXCEPTION WHEN OTHERS THEN
-      NULL;
-    END $$;
-  `);
+  await runMigrations(db);
   const seed = JSON.parse(
     await readFile(join(__dirname, "../src/seed.json"), "utf8"),
   );
@@ -414,6 +531,16 @@ async function bootstrap() {
       options.config = { ...options.config, rateLimit: false };
     }
     if (options.url === "/api/login")
+      options.config = {
+        ...options.config,
+        rateLimit: { max: 5, timeWindow: "15 minutes" },
+      };
+    if (options.url === "/api/password-reset/request")
+      options.config = {
+        ...options.config,
+        rateLimit: { max: 3, timeWindow: "15 minutes" },
+      };
+    if (options.url === "/api/admin/change-password")
       options.config = {
         ...options.config,
         rateLimit: { max: 5, timeWindow: "15 minutes" },
@@ -478,6 +605,8 @@ async function bootstrap() {
       .catch(() => console.error("Retention cleanup failed"));
   await cleanup();
   setInterval(cleanup, 86400000).unref();
+  const stopContactWorker = startContactNotificationWorker(db);
+  app.getHttpAdapter().getInstance().addHook("onClose", stopContactWorker);
   app.enableShutdownHooks();
   await app.listen(3000, "0.0.0.0");
 }
