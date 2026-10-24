@@ -1,6 +1,21 @@
 # Validación de la entrega y aseguramiento de calidad (QA)
 
-Última comprobación: **27 de septiembre de 2026** (commit base `0fdfe52` con mejoras de endurecimiento y verificación de producción).
+## Comprobaciones locales — 24 de octubre de 2026
+
+El 24 de octubre se validó el estado local con el stack de desarrollo en `http://localhost:8086`:
+
+- `npm run check`: compilación de API y web y revisión de Astro correctas; 46 archivos, 0 errores, 0 advertencias y 0 sugerencias.
+- `npm test`: 175 pruebas unitarias correctas.
+- `npm run test:db`: 101 pruebas correctas en PostgreSQL 18.6 efímero, incluidas migraciones idempotentes, preservación de datos y deduplicación de avisos.
+- `npm run test:api`: 194 escenarios correctos.
+- `npm run test:web`: 47 escenarios correctos, incluidos contacto y portada en ES/EN/FR/DE/PT.
+- `CI_GATEWAY_PORT=8088 CI_HTTPS_PORT=18443 bash scripts/verify-production.sh`: imágenes de producción construidas desde el árbol local; 249/249 pruebas correctas en stack Docker aislado. Sin reinicios ni eventos OOM. Pico cgroup: gateway 18.1 MiB, web 88.3 MiB, API 164.7 MiB y PostgreSQL 112.9 MiB.
+
+Estas comprobaciones son locales. La suite Docker usó imágenes de producción construidas desde este árbol en un stack desechable; no desplegó cambios. No prueban la recepción en un buzón real, los respaldos externos, las alertas de monitoreo, el acceso a Coolify ni la migración de la base de producción. La sección histórica de abajo corresponde a la validación del 27 de septiembre y no sustituye una verificación actual de producción.
+
+## Evidencia histórica de producción — 27 de septiembre de 2026
+
+Commit base `0fdfe52` con mejoras de endurecimiento y verificación de producción.
 
 ## Resumen de resultados
 

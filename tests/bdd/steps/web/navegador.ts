@@ -20,7 +20,8 @@ const ERROR: Record<string, string> = {
 const home = (lang: string) => (lang === "es" ? "/" : `/${lang}/`);
 
 // Sin analítica externa durante las pruebas.
-Before(async ({ context }) => {
+Before(async ({ context, world }) => {
+  await context.setExtraHTTPHeaders({ "X-Forwarded-For": world.ip });
   await context.route("https://stats.yunitztech.com/**", (route) =>
     route.fulfill({
       status: 200,

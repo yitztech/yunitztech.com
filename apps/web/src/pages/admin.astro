@@ -29,6 +29,33 @@ import Layout from "../layouts/Layout.astro";
         </label>
         <button class="button">Iniciar sesión</button>
       </form>
+      <details>
+        <summary>¿Olvidaste tu contraseña?</summary>
+        <form id="password-reset-request">
+          <label>
+            Correo para recuperar acceso
+            <input name="email" type="email" autocomplete="username" required />
+          </label>
+          <button class="secondary">Enviar instrucciones</button>
+        </form>
+      </details>
+    </section>
+    <section id="password-reset-panel" class="admin-login" hidden>
+      <h1>Restablecer contraseña</h1>
+      <form id="password-reset-complete">
+        <label>
+          Nueva contraseña (16 caracteres mínimo)
+          <input
+            name="password"
+            type="password"
+            autocomplete="new-password"
+            minlength="16"
+            maxlength="200"
+            required
+          />
+        </label>
+        <button class="button">Guardar contraseña</button>
+      </form>
     </section>
     <section id="dashboard" hidden>
       <div class="admin-top">
@@ -40,6 +67,32 @@ import Layout from "../layouts/Layout.astro";
           Cerrar sesión
         </button>
       </div>
+      <details class="admin-panel">
+        <summary>Cambiar contraseña</summary>
+        <form id="change-password">
+          <label>
+            Contraseña actual
+            <input
+              name="currentPassword"
+              type="password"
+              autocomplete="current-password"
+              required
+            />
+          </label>
+          <label>
+            Nueva contraseña (16 caracteres mínimo)
+            <input
+              name="newPassword"
+              type="password"
+              autocomplete="new-password"
+              minlength="16"
+              maxlength="200"
+              required
+            />
+          </label>
+          <button class="button">Actualizar contraseña</button>
+        </form>
+      </details>
       <div class="admin-tabs" aria-label="Secciones del panel">
         <button data-tab="overview" aria-pressed="true">
           Resumen

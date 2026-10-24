@@ -4,6 +4,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { Pool } from "pg";
+import { runMigrations } from "../../apps/api/src/migrations";
+import { queueContactNotification } from "../../apps/api/src/contact-notifications";
 
 const url = process.env.DB_TEST_URL;
 if (!url) throw new Error("Define DB_TEST_URL o ejecuta npm run test:db");
@@ -96,8 +98,42 @@ describe("esquema", () => {
     );
     assert.deepEqual(
       rows.map((r) => r.table_name),
-      ["admins", "contacts", "page_views", "posts", "sessions", "settings"],
+      [
+        "admin_password_resets",
+        "admins",
+        "contact_notifications",
+        "contacts",
+        "page_views",
+        "posts",
+        "sessions",
+        "settings",
+      ],
     );
+  });
+});
+
+describe("migraciones", () => {
+  test("actualiza locales de forma idempotente y conserva filas", async () => {
+    await pool.query("DROP TABLE IF EXISTS schema_migrations");
+    await pool.query("ALTER TABLE posts DROP CONSTRAINT posts_locale_check");
+    await pool.query(
+      "ALTER TABLE posts ADD CONSTRAINT posts_locale_check CHECK(locale IN ('es','en'))",
+    );
+    await pool.query(
+      "ALTER TABLE settings DROP CONSTRAINT settings_locale_check",
+    );
+    await pool.query(
+      "ALTER TABLE settings ADD CONSTRAINT settings_locale_check CHECK(locale IN ('es','en'))",
+    );
+    await pool.query(...insertPost());
+    await runMigrations(pool);
+    await runMigrations(pool);
+    await pool.query(...insertPost({ locale: "fr", slug: "francais" }));
+    const result = await pool.query(
+      "SELECT count(*)::int AS count FROM schema_migrations WHERE version=1 AND name='expand_editorial_locales'",
+    );
+    assert.equal(result.rows[0].count, 1);
+    assert.equal((await pool.query("SELECT id FROM posts")).rowCount, 2);
   });
 });
 
@@ -144,6 +180,24 @@ describe("contacts · éxito", () => {
       await pool.query(...insertContact());
       await expectCode("ok", "UPDATE contacts SET status=$1", [status]);
     });
+});
+
+describe("notificaciones de contacto", () => {
+  test("conserva un aviso pendiente por contacto sin duplicarlo", async () => {
+    await pool.query(...insertContact());
+    const { rows } = await pool.query("SELECT id FROM contacts");
+    await queueContactNotification(pool, rows[0].id);
+    await queueContactNotification(pool, rows[0].id);
+    const pending = await pool.query(
+      "SELECT contact_id, attempts, sent_at FROM contact_notifications",
+    );
+    assert.equal(pending.rowCount, 1);
+    assert.deepEqual(pending.rows[0], {
+      contact_id: rows[0].id,
+      attempts: 0,
+      sent_at: null,
+    });
+  });
 });
 
 describe("contacts · fracaso", () => {

@@ -14,6 +14,7 @@ const status = (text: string) => {
 };
 let data: Data;
 let currentTab = "overview";
+const resetToken = new URLSearchParams(location.hash.slice(1)).get("reset");
 async function request(path: string, method = "GET", body?: unknown) {
   const r = await fetch("/api/" + path, {
     method,
@@ -205,7 +206,8 @@ function editPost(p?: any) {
   $("#post-preview").setAttribute("src", p?.image || "/images/mvp-studio.webp");
   const link = $<HTMLAnchorElement>("#post-public-link");
   link.hidden = !p?.published;
-  if (p) link.href = (p.locale === "es" ? "" : "/" + p.locale) + "/blog/" + p.slug;
+  if (p)
+    link.href = (p.locale === "es" ? "" : "/" + p.locale) + "/blog/" + p.slug;
 }
 const siteForm = $<HTMLFormElement>("#site-form");
 function loadSite() {
@@ -263,6 +265,28 @@ $("#logout").onclick = async () => {
     status((e as Error).message);
   }
 };
+$("#change-password").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const form = event.currentTarget as HTMLFormElement;
+  const button = form.querySelector("button")!;
+  button.disabled = true;
+  try {
+    await request(
+      "admin/change-password",
+      "POST",
+      Object.fromEntries(new FormData(form)),
+    );
+    form.reset();
+    data = undefined as unknown as Data;
+    $("#dashboard").hidden = true;
+    $("#login-panel").hidden = false;
+    status("Contraseña actualizada. Inicia sesión con la nueva contraseña.");
+  } catch (error) {
+    status((error as Error).message);
+  } finally {
+    button.disabled = false;
+  }
+});
 document.querySelectorAll<HTMLButtonElement>("[data-tab]").forEach(
   (b) =>
     (b.onclick = () => {
@@ -366,7 +390,44 @@ for (const prefix of ["post", "site"]) {
     }
   };
 }
-load().catch((e) => {
-  if (!String((e as Error).message).includes("Inicia sesión"))
-    status((e as Error).message);
+$("#password-reset-request").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const form = event.currentTarget as HTMLFormElement;
+  try {
+    const result = await request(
+      "password-reset/request",
+      "POST",
+      Object.fromEntries(new FormData(form)),
+    );
+    form.reset();
+    status(result.message);
+  } catch (error) {
+    status((error as Error).message);
+  }
 });
+$("#password-reset-complete").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const form = event.currentTarget as HTMLFormElement;
+  try {
+    await request("password-reset/complete", "POST", {
+      token: resetToken,
+      password: field(form, "password").value,
+    });
+    history.replaceState({}, "", "/admin");
+    $("#password-reset-panel").hidden = true;
+    $("#login-panel").hidden = false;
+    form.reset();
+    status("Contraseña actualizada. Inicia sesión.");
+  } catch (error) {
+    status((error as Error).message);
+  }
+});
+if (resetToken) {
+  $("#login-panel").hidden = true;
+  $("#password-reset-panel").hidden = false;
+} else {
+  load().catch((e) => {
+    if (!String((e as Error).message).includes("Inicia sesión"))
+      status((e as Error).message);
+  });
+}

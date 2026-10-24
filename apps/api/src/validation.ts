@@ -159,6 +159,17 @@ export const loginSchema = z.object({
   email: z.string().trim().toLowerCase().pipe(z.email().max(LIMITS.email.max)),
   password: z.string().min(1).max(LIMITS.password.max),
 });
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1).max(LIMITS.password.max),
+  newPassword: z.string().min(16).max(LIMITS.password.max),
+});
+export const passwordResetRequestSchema = z.object({
+  email: z.string().trim().toLowerCase().pipe(z.email().max(LIMITS.email.max)),
+});
+export const passwordResetSchema = z.object({
+  token: z.string().regex(/^[a-f0-9]{64}$/),
+  password: z.string().min(16).max(LIMITS.password.max),
+});
 
 export const statusSchema = z.object({ status: z.enum(CONTACT_STATUSES) });
 export const idSchema = z.coerce.number().int().positive().max(2147483647);

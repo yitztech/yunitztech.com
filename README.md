@@ -41,7 +41,7 @@ El editor usa texto y subtítulos `##`, no HTML arbitrario. Para evitar código 
 
 ## Alcance
 
-Los servicios de tiendas, reservaciones, listas de correo, aplicaciones y automatización se presentan como la oferta de la empresa. Esta entrega es su sitio comercial y CMS; no implementa una tienda ni una plataforma de reservaciones para terceros. El contacto se recibe en el panel; no se envían notificaciones por email sin un proveedor SMTP configurado.
+Los servicios de tiendas, reservaciones, listas de correo, aplicaciones y automatización se presentan como la oferta de la empresa. Esta entrega es su sitio comercial y CMS; no implementa una tienda ni una plataforma de reservaciones para terceros. El contacto se recibe en el panel. Si SMTP está configurado, también se envía un aviso mediante una cola persistente con reintentos; si no, los mensajes siguen disponibles en el panel y los avisos permanecen pendientes.
 
 Se eligió un backend modular sencillo, sin Kubernetes, Redis ni microservicios innecesarios para esta carga. El listado de experiencia técnica orienta la oferta, pero no se convierte en una lista de tecnologías en la portada.
 

@@ -2,20 +2,21 @@
 
 ## Contrato de despliegue y responsabilidades — W4
 
-| Parámetro | Valor o responsable |
-| --- | --- |
-| Coolify `IMAGE_PREFIX` | `ghcr.io/yprevot/yunitztech.com` (minúsculas) |
-| Coolify `IMAGE_TAG` | `main` (o SHA de Git para rollbacks) |
-| Coolify `SITE_URL` | `https://yunitztech.com` (sin barra final) |
-| Imágenes en GHCR | `${IMAGE_PREFIX}-gateway:${IMAGE_TAG}`, `${IMAGE_PREFIX}-web:${IMAGE_TAG}`, `${IMAGE_PREFIX}-api:${IMAGE_TAG}` |
-| Visibilidad de imágenes | **Públicas** en GHCR (pull anónimo sin credenciales en Coolify). No privatizar sin coordinación. |
-| Endpoints obligatorios | `/health` (gateway 8080), `/api/health` (API 3000), `/version.json` (revisión de compilación en web) |
-| Requisitos de runtime | Docker Engine 29.8.1, Node.js 24.21.0 para CI y PostgreSQL 18.6 |
-| Volúmenes persistentes | `pgdata18` (`/var/lib/postgresql`) y `uploads` (`/app/uploads`) |
-| Variables obligatorias | `POSTGRES_PASSWORD`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `LEGAL_NAME`, `LEGAL_COUNTRY`, `LEGAL_ADDRESS`, `PRIVACY_EMAIL`, `TRUSTED_PROXY_CIDR` |
-| Secretos GitHub | `COOLIFY_WEBHOOK`, `COOLIFY_TOKEN` (permiso mínimo de despliegue) |
-| Variable GitHub `production` | `SITE_URL` |
-| Variable de seguridad temporal | `POSTGRES18_MIGRATION_READY` (mantener sin definir hasta completar la migración) |
+| Parámetro                      | Valor o responsable                                                                                                                         |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Coolify `IMAGE_PREFIX`         | `ghcr.io/yprevot/yunitztech.com` (minúsculas)                                                                                               |
+| Coolify `IMAGE_TAG`            | `main` (o SHA de Git para rollbacks)                                                                                                        |
+| Coolify `SITE_URL`             | `https://yunitztech.com` (sin barra final)                                                                                                  |
+| Imágenes en GHCR               | `${IMAGE_PREFIX}-gateway:${IMAGE_TAG}`, `${IMAGE_PREFIX}-web:${IMAGE_TAG}`, `${IMAGE_PREFIX}-api:${IMAGE_TAG}`                              |
+| Visibilidad de imágenes        | **Públicas** en GHCR (pull anónimo sin credenciales en Coolify). No privatizar sin coordinación.                                            |
+| Endpoints obligatorios         | `/health` (gateway 8080), `/api/health` (API 3000), `/version.json` (revisión de compilación en web)                                        |
+| Requisitos de runtime          | Docker Engine 29.8.1, Node.js 24.21.0 para CI y PostgreSQL 18.6                                                                             |
+| Volúmenes persistentes         | `pgdata18` (`/var/lib/postgresql`) y `uploads` (`/app/uploads`)                                                                             |
+| Variables obligatorias         | `POSTGRES_PASSWORD`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `LEGAL_NAME`, `LEGAL_COUNTRY`, `LEGAL_ADDRESS`, `PRIVACY_EMAIL`, `TRUSTED_PROXY_CIDR` |
+| Variables opcionales de correo | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`, `CONTACT_NOTIFICATION_TO`                               |
+| Secretos GitHub                | `COOLIFY_WEBHOOK`, `COOLIFY_TOKEN` (permiso mínimo de despliegue)                                                                           |
+| Variable GitHub `production`   | `SITE_URL`                                                                                                                                  |
+| Variable de seguridad temporal | `POSTGRES18_MIGRATION_READY` (mantener sin definir hasta completar la migración)                                                            |
 
 No renombrar variables ni añadir interpolaciones obligatorias `${…:?}` sin coordinar antes el contrato con infraestructura. Los valores de `NODE_OPTIONS` están integrados como literales dentro de `compose.prod.yml`. Mantener los nombres de servicios y la ausencia de `ports` en producción. Para el salto mayor de PostgreSQL se conserva `pgdata` y se crea `pgdata18`, tal como se explica abajo.
 
@@ -45,6 +46,7 @@ PostgreSQL 18 requiere una migración entre versiones mayores; cambiar la etique
    ```
 
    Copia el archivo y el hash a un destino externo al VPS y comprueba allí el hash con `sha256sum -c`. No sigas si no puedes verificar el archivo externo.
+
 4. Detén `gateway`, `web` y `api` desde Coolify para cerrar el tráfico y las escrituras; luego detén `db`. Con la base detenida, conserva una copia recuperable del volumen PostgreSQL 17 (por ejemplo, un snapshot de almacenamiento); no archives el directorio de datos mientras PostgreSQL está activo.
 5. Actualiza la definición del recurso a la configuración de `main` y revisa el Compose desplegable y el almacenamiento persistente resultante. Despliega **solo el servicio `db`** usando Coolify CLI (`coolify deploy uuid <APP_UUID> --service db --latest`) o el control por componente equivalente. [Coolify CLI permite seleccionar un servicio dentro de una aplicación Compose](https://coolify.io/docs/cli/deploy-applications). Confirma que el contenedor está en PostgreSQL 18.6, saludable y usando el volumen nuevo `pgdata18`. No inicies todavía API, web ni gateway. Si tu recurso no ofrece despliegue por componente, detente: no uses el despliegue completo ni improvises con `compose.prod.yml` local; primero identifica la definición Compose generada, proyecto y variables exactos de Coolify.
 6. Define `DB18_CONTAINER` con el nombre del nuevo contenedor y restaura el respaldo en PostgreSQL 18.6 mientras la aplicación sigue detenida:
@@ -77,6 +79,7 @@ Si falla la validación antes de reabrir el sitio, detén el componente `db`, re
 Para garantizar la convivencia en un VPS de 4 GB RAM y 2 CPU compartido con servidor de correo y otros servicios, `compose.prod.yml` fija techos estrictos por contenedor. La suma de límites de memoria es de **1088 MiB**, dejando casi 3 GB de memoria física libres para el sistema operativo y el correo.
 
 Adicionalmente:
+
 - La API de Node ejecuta `sharp.concurrency(1)` durante la inicialización para regular los hilos de decodificación y transformación de imágenes sin saturar la CPU ni provocar picos incontrolados de memoria.
 - `web` y `api` tienen configurados sus límites de heap V8 mediante `NODE_OPTIONS` (`--max-old-space-size=176` y `--max-old-space-size=320` respectivamente), garantizando margen para los buffers nativos de libvips, OpenSSL y Fastify.
 
@@ -84,12 +87,12 @@ Adicionalmente:
 
 Medición realizada el 2026-09-27 sobre Linux aarch64 (Docker 2 CPU, host macOS) ejecutando las imágenes reales de producción con carga de subida de 5 MB (20 MP) y login concurrente con Argon2:
 
-| Servicio | Techo Memoria | Techo CPU | `NODE_OPTIONS` | Reposo medio (MiB) | Pico observado (MiB) | Pico CPU (%) | Pico cgroup (`memory.peak`) | Reinicios | OOMKilled |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| **gateway** | 64 MiB | 0.25 | N/A | 5.1 | 11.7 | 1.1% | 15.9 MiB | 0 | false |
-| **web** | 256 MiB | 0.50 | `--max-old-space-size=176` | 26.3 | 51.1 | 12.9% | 69.1 MiB | 0 | false |
-| **api** | 512 MiB | 1.00 | `--max-old-space-size=320` | 36.4 | 41.5 | 19.2% | 159.0 MiB | 0 | false |
-| **db** | 256 MiB | 0.50 | N/A | 25.7 | 35.0 | 2.5% | 113.5 MiB | 0 | false |
+| Servicio    | Techo Memoria | Techo CPU | `NODE_OPTIONS`             | Reposo medio (MiB) | Pico observado (MiB) | Pico CPU (%) | Pico cgroup (`memory.peak`) | Reinicios | OOMKilled |
+| ----------- | ------------- | --------- | -------------------------- | ------------------ | -------------------- | ------------ | --------------------------- | --------- | --------- |
+| **gateway** | 64 MiB        | 0.25      | N/A                        | 5.1                | 11.7                 | 1.1%         | 15.9 MiB                    | 0         | false     |
+| **web**     | 256 MiB       | 0.50      | `--max-old-space-size=176` | 26.3               | 51.1                 | 12.9%        | 69.1 MiB                    | 0         | false     |
+| **api**     | 512 MiB       | 1.00      | `--max-old-space-size=320` | 36.4               | 41.5                 | 19.2%        | 159.0 MiB                   | 0         | false     |
+| **db**      | 256 MiB       | 0.50      | N/A                        | 25.7               | 35.0                 | 2.5%         | 113.5 MiB                   | 0         | false     |
 
 **Resultado:** 0 reinicios, 0 eventos OOM (`oom=0`, `oom_kill=0`), 4 servicios saludables en todo momento. El pico de cgroup de la API (159 MiB) se mantuvo muy por debajo de su límite de 512 MiB incluso durante la decodificación de 20 megapíxeles y verificación de Argon2 en paralelo.
 
@@ -120,6 +123,10 @@ No confirmes `backups/` en Git. Para producción usa el sistema de backup de Pos
 
 ## Recuperar acceso al administrador
 
+El panel permite cambiar la contraseña desde una sesión autenticada o solicitar un enlace de recuperación por correo. Los enlaces vencen en una hora, se almacenan como hash y solo se pueden usar una vez. Para habilitar recuperación y avisos de contactos, configura `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM` y `CONTACT_NOTIFICATION_TO` en Coolify. Usa un remitente verificado por el proveedor; `SMTP_PASSWORD` debe guardarse como secreto. Sin SMTP los contactos siguen guardándose y los avisos permanecen pendientes.
+
+El worker reintenta los avisos con espera creciente, hasta una hora entre intentos. Si el proceso se interrumpe durante el envío, puede llegar a repetirse un aviso; SMTP no garantiza entrega exactamente una vez.
+
 Cambia `ADMIN_PASSWORD` en el entorno y recrea el servicio API para que reciba la nueva variable. Después ejecuta en la consola del contenedor API de producción:
 
 ```sh
@@ -142,6 +149,7 @@ Cada imagen tiene también un tag con el SHA de Git. Para volver a una revisión
 ## Analítica y privacidad — C4
 
 El sitio implementa un modelo de medición híbrido respetuoso con la privacidad sin almacenar datos personales ni utilizar cookies de rastreo en el sitio público:
+
 1. **Analítica propia interna (`/api/view`):** Registra agregados numéricos diarios por página y dominio de procedencia sin almacenar direcciones IP, URLs completas ni identificadores de visitantes.
 2. **Instancia privada de Umami (`https://stats.yunitztech.com`):** Analítica open-source alojada en infraestructura propia (website id `e0ea1d12-7f07-4fe9-9825-9afb0fbcde66`), cargada de forma asíncrona (`defer`) con atributo `data-do-not-track="true"`.
 3. **Respeto a señales de privacidad:** Ambos sistemas respetan las señales `Do Not Track` (`DNT`) y `Global Privacy Control` (`GPC`) del navegador, omitiendo la recolección si el usuario las tiene activas.
