@@ -136,3 +136,10 @@ for service in gateway web api db; do
   docker exec "$container_id" cat /sys/fs/cgroup/memory.peak > "$artifact_dir/${service}-memory-peak.txt"
 done
 node scripts/check-containers.mjs "$artifact_dir" | tee "$artifact_dir/containers-summary.tsv"
+
+# Admin panel on its own host: recreate gateway and api with ADMIN_HOST and check
+# the routing of both hosts. The journeys above cover the default /admin layout.
+admin_host="admin.example.test"
+printf 'ADMIN_HOST=%s\n' "$admin_host" >> "$environment_file"
+"${compose[@]}" up -d --force-recreate --no-deps --wait --wait-timeout 120 api gateway
+node scripts/check-admin-host.mjs "http://127.0.0.1:$gateway_port" "$admin_host" "https://127.0.0.1:$https_port"

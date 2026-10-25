@@ -38,3 +38,4 @@ COPY infra/nginx/security-headers.conf /etc/nginx/security-headers.conf
 COPY infra/nginx/default.conf /etc/nginx/templates/default.conf.template
 
 COPY --chmod=755 infra/nginx/05-runtime-dirs.sh /docker-entrypoint.d/05-runtime-dirs.sh
+COPY --chmod=755 infra/nginx/25-admin-host.sh /docker-entrypoint.d/25-admin-host.sh

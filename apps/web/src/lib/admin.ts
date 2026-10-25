@@ -413,7 +413,7 @@ $("#password-reset-complete").addEventListener("submit", async (event) => {
       token: resetToken,
       password: field(form, "password").value,
     });
-    history.replaceState({}, "", "/admin");
+    history.replaceState({}, "", location.pathname);
     $("#password-reset-panel").hidden = true;
     $("#login-panel").hidden = false;
     form.reset();
