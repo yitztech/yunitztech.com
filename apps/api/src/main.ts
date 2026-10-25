@@ -46,9 +46,14 @@ import {
 } from "./validation";
 sharp.concurrency(1);
 const origin = process.env.SITE_URL || "http://localhost:8086";
+// Optional host for the admin panel (e.g. admin.yunitztech.com); without it the panel lives at /admin.
+const adminHost = process.env.ADMIN_HOST || "";
+const adminOrigin = adminHost ? `https://${adminHost}` : "";
+const adminUrl = adminOrigin ? `${adminOrigin}/` : `${origin}/admin`;
 function isAllowedOrigin(clientOrigin?: string): boolean {
   if (!clientOrigin) return false;
   if (clientOrigin === origin) return true;
+  if (adminOrigin && clientOrigin === adminOrigin) return true;
   if (process.env.NODE_ENV !== "production") {
     try {
       const u = new URL(clientOrigin);
@@ -165,6 +170,7 @@ class ApiController {
       host = new URL(d.referrer).hostname;
       if (
         host === new URL(origin).hostname ||
+        host === adminHost ||
         host === req.headers.host?.split(":")[0] ||
         host === "localhost" ||
         host.endsWith(".localhost")
@@ -221,7 +227,7 @@ class ApiController {
         "INSERT INTO admin_password_resets(token_hash,admin_id,expires_at) VALUES($1,$2,now()+interval '1 hour')",
         [digest(token), admin.id],
       );
-      const resetUrl = `${origin}/admin#reset=${encodeURIComponent(token)}`;
+      const resetUrl = `${adminUrl}#reset=${encodeURIComponent(token)}`;
       void sendAdminPasswordReset(admin.email, resetUrl).catch(() =>
         console.error("Admin password reset email delivery failed"),
       );
@@ -474,6 +480,8 @@ async function bootstrap() {
     (!process.env.SITE_URL?.startsWith("https://") || !process.env.DATABASE_URL)
   )
     throw new Error("Production requires HTTPS SITE_URL and DATABASE_URL");
+  if (adminHost && !/^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(adminHost))
+    throw new Error("ADMIN_HOST must be a lowercase host name");
   await mkdir(uploads, { recursive: true });
   dummyHash = await argon2.hash(randomBytes(32));
   await db.query(await readFile(join(__dirname, "../src/schema.sql"), "utf8"));

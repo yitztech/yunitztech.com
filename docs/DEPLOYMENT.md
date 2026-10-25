@@ -2,21 +2,22 @@
 
 ## Contrato de despliegue y responsabilidades — W4
 
-| Parámetro                      | Valor o responsable                                                                                                                         |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Coolify `IMAGE_PREFIX`         | `ghcr.io/yprevot/yunitztech.com` (minúsculas)                                                                                               |
-| Coolify `IMAGE_TAG`            | `main` (o SHA de Git para rollbacks)                                                                                                        |
-| Coolify `SITE_URL`             | `https://yunitztech.com` (sin barra final)                                                                                                  |
-| Imágenes en GHCR               | `${IMAGE_PREFIX}-gateway:${IMAGE_TAG}`, `${IMAGE_PREFIX}-web:${IMAGE_TAG}`, `${IMAGE_PREFIX}-api:${IMAGE_TAG}`                              |
-| Visibilidad de imágenes        | **Públicas** en GHCR (pull anónimo sin credenciales en Coolify). No privatizar sin coordinación.                                            |
-| Endpoints obligatorios         | `/health` (gateway 8080), `/api/health` (API 3000), `/version.json` (revisión de compilación en web)                                        |
-| Requisitos de runtime          | Docker Engine 29.8.1, Node.js 24.21.0 para CI y PostgreSQL 18.6                                                                             |
-| Volúmenes persistentes         | `pgdata18` (`/var/lib/postgresql`) y `uploads` (`/app/uploads`)                                                                             |
-| Variables obligatorias         | `POSTGRES_PASSWORD`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `LEGAL_NAME`, `LEGAL_COUNTRY`, `LEGAL_ADDRESS`, `PRIVACY_EMAIL`, `TRUSTED_PROXY_CIDR` |
-| Variables opcionales de correo | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`, `CONTACT_NOTIFICATION_TO`                               |
-| Secretos GitHub                | `COOLIFY_WEBHOOK`, `COOLIFY_TOKEN` (permiso mínimo de despliegue)                                                                           |
-| Variable GitHub `production`   | `SITE_URL`                                                                                                                                  |
-| Variable GitHub Actions `production` | `POSTGRES18_MIGRATION_READY=true` (migración completada; requerida para el despliegue automático)                                    |
+| Parámetro                            | Valor o responsable                                                                                                                         |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Coolify `IMAGE_PREFIX`               | `ghcr.io/yprevot/yunitztech.com` (minúsculas)                                                                                               |
+| Coolify `IMAGE_TAG`                  | `main` (o SHA de Git para rollbacks)                                                                                                        |
+| Coolify `SITE_URL`                   | `https://yunitztech.com` (sin barra final)                                                                                                  |
+| Imágenes en GHCR                     | `${IMAGE_PREFIX}-gateway:${IMAGE_TAG}`, `${IMAGE_PREFIX}-web:${IMAGE_TAG}`, `${IMAGE_PREFIX}-api:${IMAGE_TAG}`                              |
+| Visibilidad de imágenes              | **Públicas** en GHCR (pull anónimo sin credenciales en Coolify). No privatizar sin coordinación.                                            |
+| Endpoints obligatorios               | `/health` (gateway 8080), `/api/health` (API 3000), `/version.json` (revisión de compilación en web)                                        |
+| Requisitos de runtime                | Docker Engine 29.8.1, Node.js 24.21.0 para CI y PostgreSQL 18.6                                                                             |
+| Volúmenes persistentes               | `pgdata18` (`/var/lib/postgresql`) y `uploads` (`/app/uploads`)                                                                             |
+| Variables obligatorias               | `POSTGRES_PASSWORD`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `LEGAL_NAME`, `LEGAL_COUNTRY`, `LEGAL_ADDRESS`, `PRIVACY_EMAIL`, `TRUSTED_PROXY_CIDR` |
+| Variables opcionales de correo       | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`, `CONTACT_NOTIFICATION_TO`                               |
+| Panel en su propio host              | `ADMIN_HOST` (p. ej. `admin.yunitztech.com`; sin definir, el panel sigue en `/admin`)                                                       |
+| Secretos GitHub                      | `COOLIFY_WEBHOOK`, `COOLIFY_TOKEN` (permiso mínimo de despliegue)                                                                           |
+| Variable GitHub `production`         | `SITE_URL`                                                                                                                                  |
+| Variable GitHub Actions `production` | `POSTGRES18_MIGRATION_READY=true` (migración completada; requerida para el despliegue automático)                                           |
 
 No renombrar variables ni añadir interpolaciones obligatorias `${…:?}` sin coordinar antes el contrato con infraestructura. Los valores de `NODE_OPTIONS` están integrados como literales dentro de `compose.prod.yml`. Mantener los nombres de servicios y la ausencia de `ports` en producción. Para el salto mayor de PostgreSQL se conserva `pgdata` y se crea `pgdata18`, tal como se explica abajo.
 
@@ -124,6 +125,8 @@ docker compose -f compose.dev.yml exec -T db pg_dump -U yunitz -d yunitz -Fc > b
 No confirmes `backups/` en Git. Para producción usa el sistema de backup de PostgreSQL de Coolify o un job externo con credenciales restringidas. Prueba restaurar la base y los medios en una instancia aislada. Define retención, cifrado y eliminación de respaldos según el aviso de privacidad; la limpieza automática solo elimina registros de la base activa.
 
 ## Recuperar acceso al administrador
+
+Con `ADMIN_HOST`, el gateway sirve el panel en `https://<ADMIN_HOST>/` y el dominio del sitio redirige `/admin` allí (301). El login, la recuperación y la API de administración responden 404 en el dominio del sitio; los enlaces de recuperación apuntan al host del panel. El host del panel no se indexa (`robots.txt` con `Disallow: /` y `X-Robots-Tag`) y sus demás rutas redirigen al sitio. Añade ese dominio a la aplicación en Coolify (gateway:8080) y su registro DNS. `scripts/verify-production.sh` comprueba los dos modos.
 
 El panel permite cambiar la contraseña desde una sesión autenticada o solicitar un enlace de recuperación por correo. Los enlaces vencen en una hora, se almacenan como hash y solo se pueden usar una vez. Para habilitar recuperación y avisos de contactos, configura `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM` y `CONTACT_NOTIFICATION_TO` en Coolify. Usa un remitente verificado por el proveedor; `SMTP_PASSWORD` debe guardarse como secreto. Sin SMTP los contactos siguen guardándose y los avisos permanecen pendientes.
 

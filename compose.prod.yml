@@ -7,6 +7,9 @@ services:
     cpus: 0.25
     environment:
       TRUSTED_PROXY_CIDR: ${TRUSTED_PROXY_CIDR:?Set the exact Coolify proxy IP or dedicated proxy subnet}
+      # Optional: serve the admin panel on its own host (e.g. admin.yunitztech.com)
+      ADMIN_HOST: ${ADMIN_HOST:-}
+      SITE_URL: ${SITE_URL:?Set SITE_URL}
     image: ${IMAGE_PREFIX:?Set lowercase ghcr.io/owner/repo}-gateway:${IMAGE_TAG:-main}
     restart: unless-stopped
     read_only: true
@@ -69,6 +72,7 @@ services:
       SITE_URL: ${SITE_URL:?Set SITE_URL}
       DATABASE_URL: postgresql://yunitz:${POSTGRES_PASSWORD:?Set URL-safe database password}@db:5432/yunitz
       ADMIN_EMAIL: ${ADMIN_EMAIL:?Set admin email}
+      ADMIN_HOST: ${ADMIN_HOST:-}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set initial password of at least 16 characters}
       UPLOAD_DIR: /app/uploads
       SMTP_HOST: ${SMTP_HOST:-}
