@@ -30,7 +30,11 @@ const {
 
 const currentLang = (supportedLocales.includes(lang as any) ? lang : "es") as Locale;
 const home = currentLang === "es" ? "/" : `/${currentLang}/`;
-const canonical = new URL(Astro.url.pathname.replace(/\/$/, "") || "/", siteUrl).href;
+// Una sola forma por URL: sin barra final, salvo la portada de cada idioma (/en/), que es como la
+// enlazan el menú, el hreflang y el sitemap. El gateway redirige con 301 la otra forma.
+const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
+const canonicalPath = supportedLocales.some((l) => l !== "es" && path === `/${l}`) ? `${path}/` : path;
+const canonical = new URL(canonicalPath, siteUrl).href;
 
 const defaultAlternates: Record<Locale, string> = {
   es: "/",
@@ -174,9 +178,9 @@ const taglineBottom: Record<Locale, string> = {
     <meta name="description" content={description} />
     <meta name="theme-color" content="#2449e8" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="canonical" href={canonical} />
     {!noindex && (
       <>
+        <link rel="canonical" href={canonical} />
         {supportedLocales.map((l) => (
           <link
             rel="alternate"

@@ -49,7 +49,8 @@ test("the admin host serves the panel at / with its assets", async () => {
 test("the admin host keeps search engines and public pages out", async () => {
   const robots = await request(adminHost, "/robots.txt");
   assert.equal(robots.status, 200);
-  assert.match(robots.text, /^Disallow: \/$/m);
+  assert.doesNotMatch(robots.text, /^Disallow:\s*\S/m);
+  assert.equal(robots.headers["x-robots-tag"], "noindex, nofollow");
   const old = await request(adminHost, "/admin");
   assert.equal(old.status, 301);
   assert.equal(old.headers.location, "/");

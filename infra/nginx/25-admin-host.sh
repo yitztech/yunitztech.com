@@ -66,7 +66,9 @@ server {
     include /etc/nginx/security-headers.conf;
     add_header X-Robots-Tag "noindex, nofollow" always;
     default_type text/plain;
-    return 200 "User-agent: *\nDisallow: /\n";
+    # No Disallow: every response here carries X-Robots-Tag noindex, and a blocked URL
+    # with links gets indexed without Google ever reading it (AGENTS.md §9.2).
+    return 200 "User-agent: *\nAllow: /\n";
   }
   # The panel page would count as a visit to the home page.
   location = /api/view { return 204; }

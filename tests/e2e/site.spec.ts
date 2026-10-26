@@ -159,6 +159,42 @@ test("Multilingual SSR, SEO, legal pages, and all seeded articles", async ({
   expect((await request.get("/sitemap.xml")).status()).toBe(200);
   expect((await request.get("/blog/does-not-exist")).status()).toBe(404);
 });
+test("Indexing: every URL is public, private, missing or moved (AGENTS.md §9.2)", async ({
+  request,
+}) => {
+  const robots = await request.get("/robots.txt");
+  expect(robots.headers()["content-type"]).toMatch(/^text\/plain/);
+  expect(await robots.text()).not.toMatch(/^Disallow:\s*\S/m);
+  const api = await request.get("/api/posts/es");
+  expect(api.headers()["x-robots-tag"]).toMatch(/noindex/);
+  const missing = await request.get("/does-not-exist");
+  expect(missing.status()).toBe(404);
+  expect(await missing.text()).not.toMatch(/rel="canonical"/);
+  for (const [from, to] of [
+    ["/blog/", "/blog"],
+    ["/en", "/en/"],
+    ["/index.html", "/"],
+    ["/pt/privacy-policy", "/pt/politica-de-privacidade"],
+  ]) {
+    const r = await request.get(from, { maxRedirects: 0 });
+    expect(r.status(), from).toBe(301);
+    expect(new URL(r.headers().location, "http://x").pathname, from).toBe(to);
+  }
+  const sitemap = await (await request.get("/sitemap.xml")).text();
+  const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+  expect(locs.length).toBeGreaterThan(0);
+  for (const loc of locs) {
+    // The sitemap carries SITE_URL; the page is requested from the server under test
+    const { pathname } = new URL(loc);
+    const r = await request.get(pathname, { maxRedirects: 0 });
+    expect(r.status(), loc).toBe(200);
+    const html = await r.text();
+    expect(html, loc).not.toMatch(/name="robots" content="noindex/);
+    const canonical =
+      html.match(/<link rel="canonical" href="([^"]*)"/)?.[1] ?? "";
+    expect(new URL(canonical).pathname, loc).toBe(pathname);
+  }
+});
 test("Responsive layout, keyboard access and WCAG automated checks", async ({
   page,
 }) => {

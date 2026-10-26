@@ -23,6 +23,7 @@ export async function GET() {
       api("posts/pt"),
     ]);
 
+    // Cada <loc> en la forma de su canonical (Layout.astro): portadas de idioma con barra, resto sin ella
     const paths = [
       "/",
       "/en/",
