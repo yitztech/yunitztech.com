@@ -13,6 +13,24 @@ El 24 de octubre se validó el estado local con el stack de desarrollo en `http:
 
 Estas comprobaciones son locales. La suite Docker usó imágenes de producción construidas desde este árbol en un stack desechable; no desplegó cambios. No prueban la recepción en un buzón real, los respaldos externos, las alertas de monitoreo, el acceso a Coolify ni la migración de la base de producción. La sección histórica de abajo corresponde a la validación del 27 de septiembre y no sustituye una verificación actual de producción.
 
+## Despliegue integrado y verificado — 25 de octubre de 2026
+
+- PR #14 está integrado en `main` mediante el commit `65e535a`.
+- GitHub Actions terminó correctamente `verify`, la publicación de las imágenes y `deploy` para `main` en `c5546ef869044d3d290f9f2902171c017f740b2b`.
+- El endpoint público `/version.json` responde con esa misma revisión. El workflow también confirmó `/api/health` después de solicitar el despliegue a Coolify.
+- Esto confirma el despliegue y la salud de la API en esa revisión; no sustituye una comprobación de versión/volumen de PostgreSQL, una restauración de respaldo ni una prueba de entrega SMTP.
+
+## Cierre operativo — 25 de octubre de 2026
+
+El usuario confirma que el equipo responsable validó la recepción SMTP real, una restauración aislada desde Restic, las alertas HTTPS/correo/respaldo, la versión y el volumen de PostgreSQL y los datos legales publicados. Se registran como completados por confirmación del equipo; no se inspeccionaron de forma independiente en este entorno.
+
+## Comprobación de respaldos Restic en producción — 25 de octubre de 2026
+
+- Acceso de solo lectura por SSH a VPS2: el temporizador diario `restic-backup.timer` está activo; `restic-backup.service` terminó con `Result=success` el 24 de octubre a las 04:00 UTC.
+- El último snapshot de Google Drive era del 24 de octubre a las 04:00 UTC, con 23 snapshots conservados. El snapshot incluía `/var/backups/postgres` y el volumen de medios `nfgmxaqphc021p4jfxelqqj2_uploads`, que corresponde al UUID de la aplicación YunitzTech.
+- La copia cruzada de VPS1 guardó el snapshot equivalente a las 04:00 UTC. La tarea del host confirmó ambos snapshots.
+- En esa revisión, la restauración aislada no se había ejecutado. El equipo responsable confirmó después que la restauración y las demás validaciones operativas quedaron completadas; véase el cierre operativo anterior.
+
 ## Evidencia histórica de producción — 27 de septiembre de 2026
 
 Commit base `0fdfe52` con mejoras de endurecimiento y verificación de producción.
