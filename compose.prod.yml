@@ -43,6 +43,9 @@ services:
       LEGAL_COUNTRY: ${LEGAL_COUNTRY:?Set jurisdiction}
       LEGAL_ADDRESS: ${LEGAL_ADDRESS:?Set address}
       PRIVACY_EMAIL: ${PRIVACY_EMAIL:?Set privacy email}
+      # Error reporting to the platform's Bugsink (empty = off)
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-production}
     healthcheck:
       test:
         [
@@ -75,6 +78,8 @@ services:
       ADMIN_HOST: ${ADMIN_HOST:-}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set initial password of at least 16 characters}
       UPLOAD_DIR: /app/uploads
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-production}
       SMTP_HOST: ${SMTP_HOST:-}
       SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_SECURE: ${SMTP_SECURE:-false}

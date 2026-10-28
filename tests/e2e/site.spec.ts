@@ -90,7 +90,9 @@ test("Production gateway health, revision, CSP, HSTS and compiled assets", async
   );
   expect(directives["default-src"]).toBe("'self'");
   expect(directives["script-src"]).toBe("'self' https://stats.yunitztech.com");
-  expect(directives["connect-src"]).toBe("'self' https://stats.yunitztech.com");
+  expect(directives["connect-src"]).toBe(
+    "'self' https://stats.yunitztech.com https://errores.yunitztech.com",
+  );
   expect(directives["object-src"]).toBe("'none'");
   expect(violations).toEqual([]);
   await expect(page.locator("h1")).toBeVisible();

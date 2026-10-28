@@ -1,4 +1,4 @@
-export {};
+import "./errors";
 type Data = {
   contacts: any[];
   posts: any[];

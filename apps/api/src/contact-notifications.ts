@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import type { Pool, PoolClient } from "pg";
+import { log, reportError } from "./observability";
 
 export function mailConfig() {
   const host = process.env.SMTP_HOST;
@@ -125,11 +126,12 @@ export function startContactNotificationWorker(pool: Pool) {
             error instanceof Error ? error.message.slice(0, 500) : "SMTP error",
           ],
         );
-        console.error("Contact notification delivery failed");
+        log("error", "Contact notification delivery failed", { attempts });
       }
-    } catch {
+    } catch (error) {
       await client?.query("ROLLBACK").catch(() => undefined);
-      console.error("Contact notification worker failed");
+      log("error", "Contact notification worker failed");
+      reportError(error);
     } finally {
       client?.release();
       running = false;

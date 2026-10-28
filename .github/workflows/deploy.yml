@@ -77,7 +77,9 @@ jobs:
           context: .
           target: ${{ matrix.target }}
           push: true
-          build-args: RELEASE_SHA=${{ github.sha }}
+          build-args: |
+            RELEASE_SHA=${{ github.sha }}
+            SENTRY_DSN=${{ vars.SENTRY_DSN }}
           tags: |
             ${{ steps.image.outputs.prefix }}-${{ matrix.target }}:main
             ${{ steps.image.outputs.prefix }}-${{ matrix.target }}:${{ github.sha }}
