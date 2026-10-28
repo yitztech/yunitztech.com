@@ -137,6 +137,16 @@ for service in gateway web api db; do
 done
 node scripts/check-containers.mjs "$artifact_dir" | tee "$artifact_dir/containers-summary.tsv"
 
+# Passive ZAP scan of the same stack (platform audit SEG-08): any new warning fails.
+# Exceptions, each with its reason, live in tests/security/zap-reglas.tsv.
+zap_dir="$work_dir/zap"
+mkdir -p "$zap_dir" && cp tests/security/zap-reglas.tsv "$zap_dir/" && chmod -R 777 "$zap_dir"
+zap_status=0
+docker run --rm --network host -v "$zap_dir:/zap/wrk:rw" ghcr.io/zaproxy/zaproxy:2.17.0 \
+  zap-baseline.py -t "http://127.0.0.1:$gateway_port" -c zap-reglas.tsv -r zap.html || zap_status=$?
+cp "$zap_dir/zap.html" "$artifact_dir/" 2>/dev/null || true
+test "$zap_status" -eq 0
+
 # Admin panel on its own host: recreate gateway and api with ADMIN_HOST and check
 # the routing of both hosts. The journeys above cover the default /admin layout.
 admin_host="admin.example.test"
