@@ -1,0 +1,6 @@
+10017	IGNORE	(The only cross-domain script is our own Umami, stats.yunitztech.com)
+10049	IGNORE	(Public pages are cacheable on purpose)
+10055	IGNORE	(style-src 'unsafe-inline': Astro inlines component styles; scripts are not inline-allowed)
+10202	IGNORE	(CSRF: the contact form posts JSON with fetch to /api/contact and the API only accepts allowed Origin headers; method=post just keeps a no-JS submit out of the URL)
+90003	IGNORE	(No SRI on the Umami script: it changes with every Umami update and is served from our own host)
+90004	IGNORE	(No COEP: it would block the Umami script; SharedArrayBuffer is not used)

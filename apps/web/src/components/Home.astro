@@ -670,7 +670,7 @@ const contact = contactData[currentLang];
             <p>{contact.note}</p>
           </div>
         </div>
-        <form id="contact-form" class="contact-form" data-lang={currentLang}>
+        <form id="contact-form" class="contact-form" method="post" data-lang={currentLang}>
           <div class="form-row">
             <label>
               {contact.nameLabel}

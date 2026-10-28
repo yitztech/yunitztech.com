@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # Nightly verification (platform audit SEG-08): tests, ZAP and audits against main,
+  # without publishing; staggered across projects because of the organization's job limit
+  schedule:
+    - cron: "10 9 * * *"
 permissions:
   contents: read
 concurrency:
@@ -44,7 +48,7 @@ jobs:
             qa-artifacts/
   publish:
     needs: verify
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && github.event_name != 'schedule'
     runs-on: ubuntu-24.04
     permissions:
       contents: read
