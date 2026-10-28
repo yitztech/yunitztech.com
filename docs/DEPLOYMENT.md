@@ -114,7 +114,7 @@ El workflow de CI ejecuta `bash scripts/verify-production.sh`, que realiza una v
 
 ## Respaldo y recuperación
 
-Configura un respaldo programado de PostgreSQL y del volumen de medios a un destino externo. Una copia solo en el mismo VPS no protege contra pérdida del servidor. En desarrollo puedes generar una copia consistente con:
+En producción, Restic ya ejecuta respaldos diarios de PostgreSQL y medios desde VPS2 hacia Google Drive y una copia cruzada en VPS1. Se verificó una ejecución correcta el 24 de octubre de 2026; el snapshot incluía el volumen `*_uploads` de esta app y `/var/backups/postgres`. El equipo de infraestructura administra retención y cifrado. La restauración aislada está probada y se repite cada 3 meses (la evidencia está en la sección 6 de `docs/IMPLEMENTATION-PLAN.md`). En desarrollo puedes generar una copia consistente con:
 
 ```sh
 mkdir -p backups
