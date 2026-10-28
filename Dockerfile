@@ -6,12 +6,19 @@ COPY apps/web/package.json apps/web/package.json
 FROM manifests AS dependencies
 RUN npm ci
 FROM dependencies AS build
+# Browser error reporting (platform audit INT-07): the DSN is public and comes from the
+# SENTRY_DSN repository variable; empty = SDK off
+ARG SENTRY_DSN=""
+ARG RELEASE_SHA=local
+ENV PUBLIC_SENTRY_DSN=$SENTRY_DSN PUBLIC_RELEASE_SHA=$RELEASE_SHA
 COPY apps apps
 COPY scripts/trace-web.mjs scripts/trace-web.mjs
 RUN npm run build && node scripts/trace-web.mjs
 FROM manifests AS api-dependencies
 RUN npm ci --omit=dev --workspace=apps/api --include-workspace-root=false
 FROM node:24.21.0-alpine AS api
+ARG RELEASE_SHA=local
+ENV RELEASE_SHA=$RELEASE_SHA
 ENV NODE_ENV=production UPLOAD_DIR=/app/uploads
 WORKDIR /app
 COPY --from=api-dependencies /app/node_modules ./node_modules

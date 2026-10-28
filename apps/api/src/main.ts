@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import { log, reportError, requestId } from "./observability";
 import { NestFactory } from "@nestjs/core";
 import {
   FastifyAdapter,
@@ -228,9 +229,10 @@ class ApiController {
         [digest(token), admin.id],
       );
       const resetUrl = `${adminUrl}#reset=${encodeURIComponent(token)}`;
-      void sendAdminPasswordReset(admin.email, resetUrl).catch(() =>
-        console.error("Admin password reset email delivery failed"),
-      );
+      void sendAdminPasswordReset(admin.email, resetUrl).catch((error) => {
+        log("error", "Admin password reset email delivery failed");
+        reportError(error);
+      });
     }
     return {
       ok: true,
@@ -531,7 +533,12 @@ async function bootstrap() {
   }
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter({ bodyLimit: 100000, trustProxy: false, logger: false }),
+    new FastifyAdapter({
+      bodyLimit: 100000,
+      trustProxy: false,
+      logger: false,
+      genReqId: (req: any) => requestId(req.headers["x-request-id"]),
+    }),
   );
   const fastify = app.getHttpAdapter().getInstance();
   fastify.addHook("onRoute", (options: any) => {
@@ -570,6 +577,7 @@ async function bootstrap() {
     limits: { fileSize: 5 * 1024 * 1024, files: 1, fields: 0 },
   });
   fastify.addHook("onRequest", async (req: any, res: any) => {
+    res.header("X-Request-ID", req.id);
     res.header("Cache-Control", "no-store");
     if (
       ["POST", "PUT", "DELETE", "PATCH"].includes(req.method) &&
@@ -577,8 +585,21 @@ async function bootstrap() {
     )
       return res.code(403).send({ error: "Origin not allowed" });
   });
+  // One line per request (BE-22); the health check runs every few seconds and is left out
+  fastify.addHook("onResponse", async (req: any, res: any) => {
+    const path = req.url.split("?")[0];
+    if (path === "/api/health") return;
+    log(res.statusCode >= 500 ? "warn" : "info", "request", {
+      requestId: req.id,
+      method: req.method,
+      path,
+      status: res.statusCode,
+      durationMs: Math.round(res.elapsedTime),
+    });
+  });
   app.useGlobalFilters({
     catch(error: any, host: any) {
+      const req = host.switchToHttp().getRequest();
       const res = host.switchToHttp().getResponse();
       if (error instanceof ZodError)
         return res.code(400).send({
@@ -596,7 +617,13 @@ async function bootstrap() {
           fields: [],
         });
       const status = error.statusCode || error.status || 500;
-      if (status >= 500) console.error("API error", error.code || error.name);
+      if (status >= 500) {
+        log("error", "API error", {
+          requestId: req.id,
+          code: error.code || error.name,
+        });
+        reportError(error, req.id);
+      }
       res.code(status).send({
         error:
           status >= 500
@@ -610,7 +637,10 @@ async function bootstrap() {
       .query(
         "DELETE FROM sessions WHERE expires_at<now(); DELETE FROM page_views WHERE day<CURRENT_DATE-90; DELETE FROM contacts WHERE created_at<now()-interval '12 months'",
       )
-      .catch(() => console.error("Retention cleanup failed"));
+      .catch((error) => {
+        log("error", "Retention cleanup failed");
+        reportError(error);
+      });
   await cleanup();
   setInterval(cleanup, 86400000).unref();
   const stopContactWorker = startContactNotificationWorker(db);
@@ -619,6 +649,6 @@ async function bootstrap() {
   await app.listen(3000, "0.0.0.0");
 }
 bootstrap().catch((e) => {
-  console.error(e.message);
+  log("error", e.message);
   process.exit(1);
 });
