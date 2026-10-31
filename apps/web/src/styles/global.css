@@ -1,11 +1,14 @@
+@import "tailwindcss/theme";
+@import "tailwindcss/utilities";
+@source "../components/**/*.{astro,tsx}";
 :root {
-  --ink: #17233e;
-  --muted: #58657a;
-  --blue: #2449e8;
-  --pale: #edf3ff;
-  --line: #dee5ef;
-  --paper: #fff;
-  font-family: "Manrope Variable", sans-serif;
+  --ink: #0d1038;
+  --muted: #525b78;
+  --blue: #302063;
+  --pale: #fbe3e3;
+  --line: #ece3de;
+  --paper: #fefaf7;
+  font-family: "Inter Variable", sans-serif;
   color: var(--ink);
   background: var(--paper);
   font-synthesis: none;
@@ -13,8 +16,14 @@
 * {
   box-sizing: border-box;
 }
+html {
+  scroll-behavior: smooth;
+  overflow-x: clip;
+}
 body {
   margin: 0;
+  overflow-x: clip;
+  min-width: 0;
 }
 a {
   color: inherit;
@@ -647,9 +656,19 @@ nav a:hover,
   font-size: 0.85rem;
 }
 .contact-form {
-  background: #f7f9fd;
+  background: #ffffff;
+  color: var(--ink);
   padding: 32px;
   border-radius: 16px;
+}
+.contact-form label {
+  color: var(--ink);
+}
+.contact-form .checkbox {
+  color: #525b78;
+}
+.contact-form .checkbox a {
+  color: #302063;
 }
 label {
   display: flex;
@@ -826,7 +845,7 @@ footer {
 }
 .admin-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 35px;
 }
 .admin-panel {
@@ -848,6 +867,8 @@ footer {
 }
 .admin-list button {
   text-align: left;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 .metrics {
   display: grid;
@@ -1104,6 +1125,9 @@ th {
   }
 }
 @media (max-width: 390px) {
+  .container {
+    width: min(100% - 20px, 1180px);
+  }
   .service-grid,
   .form-row {
     grid-template-columns: 1fr;
@@ -1116,7 +1140,13 @@ th {
     flex-direction: column;
   }
   .nav-actions {
-    gap: 8px;
+    gap: 6px;
+  }
+  .nav-actions .button {
+    font-size: 0.72rem;
+    padding: 7px 10px;
+    gap: 6px;
+    min-height: 36px;
   }
   .language-picker summary.language {
     padding: 3px 6px;
@@ -1157,4 +1187,147 @@ th {
   .mvp-photo img {
     height: 300px;
   }
+}
+
+/* Visual direction adapted from the supplied YunitzTech mock. */
+h1, h2, h3, .brand {
+  font-family: "Plus Jakarta Sans Variable", sans-serif;
+  letter-spacing: -0.035em;
+}
+
+.header {
+  background: rgba(254, 250, 247, 0.92);
+  border-bottom: 1px solid #f4ece8;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.nav {
+  height: 74px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #3b55f6 0%, #2f2062 100%);
+  color: white;
+  box-shadow: 0 4px 12px -2px rgba(59, 85, 246, 0.45);
+  transition: transform 0.25s ease;
+  flex-shrink: 0;
+}
+
+.brand:hover .brand-mark {
+  transform: rotate(-3deg);
+}
+
+.brand-light {
+  font-weight: 300;
+  opacity: 0.75;
+}
+
+.button {
+  background: #302063;
+  border-color: #302063;
+  border-radius: 10px;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.button:hover {
+  background: #221545;
+  border-color: #221545;
+}
+
+.button-outline {
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid #e8ded9;
+  color: #0d1038;
+  box-shadow: none;
+}
+
+.button-outline:hover {
+  background: #ffffff;
+  color: #302063;
+  border-color: #302063;
+}
+
+/* Gradients and Surfaces */
+.text-gradient-brand {
+  background-image: linear-gradient(100deg, #7866d6 0%, #a259ae 48%, #d7456f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.text-gradient-rose {
+  background-image: linear-gradient(100deg, #a259ae 0%, #d7456f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero-shell {
+  background:
+    radial-gradient(120% 90% at 82% 8%, rgba(255, 241, 232, 0.9) 0%, rgba(254, 250, 247, 0) 55%),
+    radial-gradient(70% 60% at 12% 18%, rgba(252, 235, 233, 0.75) 0%, rgba(254, 250, 247, 0) 60%),
+    #fefaf7;
+}
+
+.hero-photo-mask {
+  -webkit-clip-path: inset(0 round 1.5rem);
+  clip-path: inset(0 round 1.5rem);
+}
+
+@media (min-width: 1024px) {
+  .hero-photo-mask {
+    -webkit-clip-path: url(#hero-photo-clip);
+    clip-path: url(#hero-photo-clip);
+  }
+}
+
+.peach-wash {
+  background:
+    radial-gradient(90% 70% at 100% 0%, rgba(255, 255, 255, 0.4) 0%, rgba(254, 235, 218, 0) 60%),
+    #feebda;
+}
+
+.blush-wash {
+  background:
+    radial-gradient(80% 60% at 0% 0%, rgba(255, 255, 255, 0.5) 0%, rgba(252, 242, 238, 0) 65%),
+    #fcf2ee;
+}
+
+.cta-mesh {
+  background:
+    radial-gradient(55% 120% at 4% 100%, rgba(190, 76, 137, 0.55) 0%, rgba(190, 76, 137, 0) 60%),
+    radial-gradient(45% 100% at 0% 10%, rgba(110, 83, 190, 0.55) 0%, rgba(110, 83, 190, 0) 62%),
+    linear-gradient(112deg, #3b2367 0%, #2f1d5b 52%, #241646 100%);
+}
+
+.shadow-soft {
+  box-shadow: 0 30px 70px -34px rgba(48, 32, 99, 0.3);
+}
+
+.shadow-card {
+  box-shadow: 0 20px 55px -34px rgba(48, 32, 99, 0.24);
+}
+
+.shadow-float {
+  box-shadow: 0 24px 55px -22px rgba(48, 32, 99, 0.22);
+}
+
+.footer {
+  background: #fffdfc;
+  border-top: 1px solid #f1e8e3;
 }

@@ -42,3 +42,7 @@ Los mismos límites se replican en:
 - **Apps móviles (iOS/Android):** este repositorio no contiene ninguna app móvil (solo `apps/api` y `apps/web`), así que no hay pruebas ni entorno de certificados para móvil. Si se añade una app, se debe crear su capa propia.
 - **Citas, reservas y cancelaciones:** el sistema no tiene un módulo de citas. El flujo de negocio real es: solicitud de contacto → seguimiento (`new` → `in-progress` → `closed`) → eliminación (ciclo cubierto en `ciclo-contactos.feature` y `panel-admin.feature`), más la gestión de artículos, portada, imágenes y analítica.
 - No existe campo de apellidos separado: el formulario tiene un único campo `name`.
+
+### Sustitución temporal de glob
+
+El `overrides.glob` del `package.json` fija glob 14 para corregir GHSA-3g3m-2fjr-6pw4 y la vulnerabilidad de minimatch GHSA-g3hv-75wg-m249. `@vercel/nft` y `@sentry/bundler-plugins` declaran glob 13; esta sustitución cruza su rango declarado y debe retirarse cuando ambos admitan una versión corregida. Además de `npm audit`, comprueba el build de las imágenes, el rastreo de dependencias y las pruebas integradas antes de actualizar o eliminar esta excepción.

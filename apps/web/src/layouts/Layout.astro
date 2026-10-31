@@ -1,5 +1,6 @@
 ---
-import "@fontsource-variable/manrope";
+import "@fontsource-variable/inter";
+import "@fontsource-variable/plus-jakarta-sans";
 import "../styles/global.css";
 import { siteUrl } from "../lib/api";
 
@@ -160,6 +161,14 @@ const termsNav: Record<Locale, { path: string; label: string }> = {
   pt: { path: "/pt/termos-de-servico", label: "Termos de serviço" },
 };
 
+const footerMadeWith: Record<Locale, string> = {
+  es: "Hecho con ♥ para ideas que crecen.",
+  en: "Built with ♥ for growing ideas.",
+  fr: "Fait avec ♥ pour les projets qui grandissent.",
+  de: "Mit ♥ gemacht für wachsende Ideen.",
+  pt: "Feito com ♥ para ideias que crescem.",
+};
+
 const taglineBottom: Record<Locale, string> = {
   es: "Tecnología con propósito. Hecha para tu negocio.",
   en: "Built with purpose. Made for your business.",
@@ -219,9 +228,12 @@ const taglineBottom: Record<Locale, string> = {
       <div class="container nav">
         <a class="brand" href={home} aria-label={brandAria[currentLang]}>
           <span class="brand-mark" aria-hidden="true">
-            y.
+            <svg viewBox="0 0 24 24" fill="none" class="size-4" aria-hidden="true">
+              <path d="M6.6 5.8 12 12.2l5.4-6.4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M12 12.2v6.4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+            </svg>
           </span>
-          yunitz<span class="brand-light">tech</span>
+          <span>yunitz<span class="brand-light">tech</span></span>
         </a>
         <nav aria-label={navAria[currentLang]}>
           <a href={home + "#servicios"}>{servicesNav[currentLang]}</a>
@@ -364,9 +376,12 @@ const taglineBottom: Record<Locale, string> = {
         <div>
           <a class="brand" href={home}>
             <span class="brand-mark" aria-hidden="true">
-              y.
+              <svg viewBox="0 0 24 24" fill="none" class="size-4" aria-hidden="true">
+                <path d="M6.6 5.8 12 12.2l5.4-6.4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M12 12.2v6.4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+              </svg>
             </span>
-            yunitz<span class="brand-light">tech</span>
+            <span>yunitz<span class="brand-light">tech</span></span>
           </a>
           <p>{taglineTop[currentLang]}</p>
         </div>
@@ -381,8 +396,8 @@ const taglineBottom: Record<Locale, string> = {
         </div>
       </div>
       <div class="container footer-bottom">
-        <span>© {new Date().getFullYear()} YunitzTech</span>
-        <span>{taglineBottom[currentLang]}</span>
+        <span>© {new Date().getFullYear()} YunitzTech · {taglineBottom[currentLang]}</span>
+        <span class="inline-flex items-center gap-1.5">{footerMadeWith[currentLang]}</span>
       </div>
     </footer>
     <script>
