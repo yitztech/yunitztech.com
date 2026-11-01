@@ -18,7 +18,12 @@
     "test:ci": "npm run test:unit && npm run test:e2e",
     "test:all": "npm run test:unit && npm run test:db && npm run test:e2e",
     "build": "npm run build --workspaces",
-    "check": "npm run build && npm run check -w apps/web"
+    "check": "npm run build && npm run check -w apps/web",
+    "staging:up": "bash scripts/staging.sh up",
+    "staging:down": "bash scripts/staging.sh down",
+    "staging:logs": "bash scripts/staging.sh logs",
+    "staging:status": "bash scripts/staging.sh status",
+    "staging:prod": "bash scripts/staging.sh up --prod"
   },
   "repository": {
     "type": "git",

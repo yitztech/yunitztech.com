@@ -12,3 +12,4 @@ uploads/
 backups/
 **/.astro/
 tests/bdd/.generated/
+.DS_Store

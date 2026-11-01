@@ -1,0 +1,161 @@
+# Entorno de validación local previo al despliegue (Staging / Pre-producción).
+# Replica con exactitud la topología, restricciones de seguridad y versiones de producción (compose.prod.yml),
+# aislado en localhost:8088 sin tocar datos de desarrollo ni producción.
+name: yunitztech-staging
+
+services:
+  gateway:
+    build:
+      context: .
+      target: gateway
+    image: ${IMAGE_PREFIX:-ghcr.io/yitztech/yunitztech.com}-gateway:${IMAGE_TAG:-staging}
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: ["/tmp:size=32m,mode=1777"]
+    ports:
+      - "127.0.0.1:${STAGING_PORT:-8088}:8080"
+    environment:
+      TRUSTED_PROXY_CIDR: 0.0.0.0/0
+      ADMIN_HOST: ${ADMIN_HOST:-}
+      SITE_URL: ${SITE_URL:-http://localhost:8088}
+    depends_on:
+      api: { condition: service_healthy }
+      web: { condition: service_healthy }
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, "http://127.0.0.1:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [frontend]
+
+  web:
+    build:
+      context: .
+      target: web
+      args:
+        RELEASE_SHA: ${RELEASE_SHA:-staging}
+        SENTRY_DSN: ${SENTRY_DSN:-}
+    image: ${IMAGE_PREFIX:-ghcr.io/yitztech/yunitztech.com}-web:${IMAGE_TAG:-staging}
+    restart: unless-stopped
+    user: "1000:1000"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: ["/tmp:size=32m,mode=1777"]
+    mem_limit: 256m
+    cpus: 0.5
+    environment:
+      NODE_ENV: ${NODE_ENV:-staging}
+      HOST: 0.0.0.0
+      PORT: 4321
+      NODE_OPTIONS: --max-old-space-size=176
+      API_URL: http://api:3000
+      SITE_URL: ${SITE_URL:-http://localhost:8088}
+      LEGAL_NAME: ${LEGAL_NAME:-YunitzTech (Staging / Validación)}
+      LEGAL_COUNTRY: ${LEGAL_COUNTRY:-México}
+      LEGAL_ADDRESS: ${LEGAL_ADDRESS:-Entorno Local de Validación Previa}
+      PRIVACY_EMAIL: ${PRIVACY_EMAIL:-staging@yunitztech.local}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-staging}
+    healthcheck:
+      test:
+        [
+          CMD,
+          node,
+          -e,
+          "fetch('http://localhost:4321/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    depends_on:
+      api: { condition: service_healthy }
+    networks: [frontend]
+
+  api:
+    build:
+      context: .
+      target: api
+      args:
+        RELEASE_SHA: ${RELEASE_SHA:-staging}
+    image: ${IMAGE_PREFIX:-ghcr.io/yitztech/yunitztech.com}-api:${IMAGE_TAG:-staging}
+    restart: unless-stopped
+    user: "1000:1000"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: ["/tmp:size=32m,mode=1777"]
+    mem_limit: 512m
+    cpus: 1.0
+    environment:
+      NODE_ENV: ${NODE_ENV:-staging}
+      NODE_OPTIONS: --max-old-space-size=320
+      SITE_URL: ${SITE_URL:-http://localhost:8088}
+      DATABASE_URL: postgresql://yunitz:${POSTGRES_PASSWORD:-staging_secret_pass_18}@db:5432/yunitz_staging
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@staging.yunitztech.local}
+      ADMIN_HOST: ${ADMIN_HOST:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-staging_admin_password_16ch}
+      UPLOAD_DIR: /app/uploads
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-staging}
+      SMTP_HOST: ${SMTP_HOST:-mailpit}
+      SMTP_PORT: ${SMTP_PORT:-1025}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-noreply@staging.yunitztech.local}
+      CONTACT_NOTIFICATION_TO: ${CONTACT_NOTIFICATION_TO:-alerts@staging.yunitztech.local}
+    volumes: [uploads_staging:/app/uploads]
+    depends_on:
+      db: { condition: service_healthy }
+    healthcheck:
+      test:
+        [
+          CMD,
+          node,
+          -e,
+          "fetch('http://localhost:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [backend, frontend]
+
+  db:
+    image: postgres:18.6-alpine
+    restart: unless-stopped
+    security_opt: [no-new-privileges:true]
+    mem_limit: 256m
+    cpus: 0.5
+    environment:
+      PGDATA: /var/lib/postgresql/18/docker
+      POSTGRES_DB: yunitz_staging
+      POSTGRES_USER: yunitz
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-staging_secret_pass_18}
+    volumes: [pgdata18_staging:/var/lib/postgresql]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U yunitz -d yunitz_staging"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks: [backend]
+
+  mailpit:
+    image: axllent/mailpit:v1.33.0
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${STAGING_MAILPIT_PORT:-8027}:8025"
+    networks: [frontend]
+    labels:
+      yunitztech.solo-pruebas: "true"
+
+volumes:
+  pgdata18_staging:
+  uploads_staging:
+
+networks:
+  backend:
+    internal: true
+  frontend:
