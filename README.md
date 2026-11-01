@@ -73,4 +73,16 @@ Guía completa de capas, comandos y límites de validación: [docs/TESTING.md](d
 
 Las pruebas end-to-end usan exclusivamente el entorno local y sus credenciales de `.env`. Crean datos de prueba; no las ejecutes sobre producción. Verifican bilingüismo, rutas, SEO, móvil, accesibilidad automática, contactos, sesión, editor, carga de imágenes, publicación, retirada y controles de seguridad. Los tests dejan artículos QA como borradores; puedes eliminarlos directamente en una base de pruebas. Capturas en `docs/qa/`, informe en `playwright-report/`.
 
-Consulta [despliegue y operación](docs/DEPLOYMENT.md), [diseño e imagen](docs/DESIGN.md) y [resultado de validación](docs/QA.md).
+### Staging y validación pre-despliegue
+
+Para probar la pila completa con arquitectura idéntica a producción (Nginx, Astro SSR, Fastify, Postgres y Mailpit en contenedores inmutables sin bind-mounts) o comparar errores contra la rama de producción:
+
+```sh
+npm run staging:up      # Arranca staging local con tus cambios en http://localhost:8088
+npm run staging:prod    # O apunta a las imágenes oficiales de producción (rama main)
+npm run staging:down    # Detiene el entorno de staging
+```
+
+Detalles completos y comandos avanzados: [docs/STAGING.md](docs/STAGING.md).
+
+Consulta [despliegue y operación](docs/DEPLOYMENT.md), [staging local](docs/STAGING.md), [diseño e imagen](docs/DESIGN.md) y [resultado de validación](docs/QA.md).
